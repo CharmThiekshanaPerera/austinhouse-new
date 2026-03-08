@@ -16,6 +16,7 @@ from app.routes.staff import router as staff_router
 from app.routes.customers import router as customers_router
 from app.routes.waitlist import router as waitlist_router
 from app.routes.blog import router as blog_router
+from app.routes.testimonials import router as testimonials_router
 from app.settings import settings
 from pathlib import Path
 
@@ -43,6 +44,7 @@ app.add_middleware(
 app.include_router(services_router, prefix="/api")
 app.include_router(products_router, prefix="/api")
 app.include_router(inventory_router, prefix="/api")
+app.include_router(testimonials_router, prefix="/api")
 app.include_router(uploads_router, prefix="/api")
 app.include_router(bookings_router, prefix="/api")
 app.include_router(staff_router, prefix="/api")

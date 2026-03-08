@@ -5,31 +5,14 @@ import facialImg from "@/assets/facial-treatment.jpg";
 import spaImg from "@/assets/spa-environment.jpg";
 import productsImg from "@/assets/products.jpg";
 
-const services = [
-  {
-    image: facialImg,
-    title: "Professional Skin Assessment",
-    description: "Expert analysis of your unique skin profile, followed by customized treatments that restore your natural radiance.",
-    link: "Treatments",
-    to: "/services",
-  },
-  {
-    image: spaImg,
-    title: "Immersive Spa Experience",
-    description: "Sweet fragrances, ambient lighting, soft melodies, and a unique healing touch guide you through an unforgettable journey.",
-    link: "Services",
-    to: "/services",
-  },
-  {
-    image: productsImg,
-    title: "Premium Aftercare Range",
-    description: "Maintain your restored confidence with our curated collection of gold-standard aftercare products designed for lasting results.",
-    link: "Products",
-    to: "/products",
-  },
-];
+// Fallback data removed — we use live data from useData()
+
+import { useData } from "@/contexts/DataContext";
 
 const ServicesSection = () => {
+  const { services } = useData();
+  const featuredServices = services.slice(0, 3);
+
   return (
     <section id="services" className="py-20 lg:py-32 bg-secondary/50">
       <div className="container mx-auto px-4 lg:px-8">
@@ -45,38 +28,44 @@ const ServicesSection = () => {
           </h2>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {services.map((service, index) => (
-            <motion.div
-              key={service.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.15, duration: 0.6 }}
-              className="group bg-card rounded-lg overflow-hidden shadow-lg hover:shadow-gold transition-shadow duration-500"
-            >
-              <div className="relative h-64 overflow-hidden">
-                <LazyImage
-                  src={service.image}
-                  alt={service.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  skeletonClassName="w-full h-full"
-                />
-                <div className="absolute inset-0 bg-dark-overlay-light opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              </div>
-              <div className="p-6">
-                <h3 className="font-display text-xl font-semibold text-foreground mb-3">{service.title}</h3>
-                <p className="text-muted-foreground font-body text-sm leading-relaxed mb-4">{service.description}</p>
-                <Link
-                  to={service.to}
-                  className="inline-flex items-center text-primary font-body text-sm font-bold uppercase tracking-wider hover:text-gold-light transition-colors"
-                >
-                  {service.link} →
-                </Link>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {featuredServices.length === 0 ? (
+          <div className="text-center text-muted-foreground font-body">
+            No featured services added yet. Check back soon!
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-3 gap-8">
+            {featuredServices.map((service, index) => (
+              <motion.div
+                key={service.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.15, duration: 0.6 }}
+                className="group bg-card rounded-lg overflow-hidden shadow-lg hover:shadow-gold transition-shadow duration-500 flex flex-col"
+              >
+                <div className="relative h-64 overflow-hidden flex-shrink-0">
+                  <LazyImage
+                    src={service.image}
+                    alt={service.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    skeletonClassName="w-full h-full"
+                  />
+                  <div className="absolute inset-0 bg-dark-overlay-light opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="font-display text-xl font-semibold text-foreground mb-3">{service.title}</h3>
+                  <p className="text-muted-foreground font-body text-sm leading-relaxed mb-4 flex-1 line-clamp-3">{service.description}</p>
+                  <Link
+                    to="/services"
+                    className="inline-flex items-center text-primary font-body text-sm font-bold uppercase tracking-wider hover:text-gold-light transition-colors mt-auto"
+                  >
+                    View Details →
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

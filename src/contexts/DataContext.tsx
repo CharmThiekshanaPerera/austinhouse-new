@@ -6,6 +6,7 @@ import { staffApi } from "@/lib/staffApi";
 import { customersApi } from "@/lib/customersApi";
 import { blogApi } from "@/lib/blogApi";
 import { waitlistApi } from "@/lib/waitlistApi";
+import { testimonialsApi } from "@/lib/testimonialsApi";
 
 export interface Product {
   id: string;
@@ -85,16 +86,12 @@ export interface WaitlistEntry {
   notes?: string | null;
 }
 
+// Matches backend TestimonialBase schema
 export interface Testimonial {
   id: string;
-  name: string;
-  company: string;
-  role: string;
-  content: string;
-  avatarUrl: string;
+  text: string;
+  author: string;
   rating: number;
-  featured: boolean;
-  createdAt: string;
 }
 
 export interface ContactMessage {
@@ -154,6 +151,7 @@ interface DataContextType {
   customersLoading: boolean;
   blogLoading: boolean;
   waitlistLoading: boolean;
+  testimonialsLoading: boolean;
   // Products
   addProduct: (p: Omit<Product, "id">) => Promise<Product>;
   updateProduct: (p: Product) => Promise<Product>;
@@ -181,10 +179,11 @@ interface DataContextType {
   // Waitlist (API-backed)
   addWaitlistEntry: (w: Omit<WaitlistEntry, "id">) => Promise<WaitlistEntry>;
   deleteWaitlistEntry: (id: string) => Promise<void>;
+  // Testimonials (API-backed)
+  addTestimonial: (t: Omit<Testimonial, "id">) => Promise<Testimonial>;
+  updateTestimonial: (id: string, t: Partial<Omit<Testimonial, "id">>) => Promise<Testimonial>;
+  deleteTestimonial: (id: string) => Promise<void>;
   // Local-only
-  addTestimonial: (t: Omit<Testimonial, "id" | "createdAt">) => void;
-  updateTestimonial: (t: Testimonial) => void;
-  deleteTestimonial: (id: string) => void;
   addContactMessage: (m: Omit<ContactMessage, "id" | "createdAt" | "read" | "replied">) => void;
   updateContactMessage: (m: ContactMessage) => void;
   deleteContactMessage: (id: string) => void;
@@ -225,6 +224,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [customersLoading, setCustomersLoading] = useState(true);
   const [blogLoading, setBlogLoading] = useState(true);
   const [waitlistLoading, setWaitlistLoading] = useState(true);
+  const [testimonialsLoading, setTestimonialsLoading] = useState(true);
 
   const addActivityLog = (action: string, detail: string) =>
     setActivityLogs(prev =>
@@ -334,6 +334,22 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         console.warn("Failed to load waitlist from API.", e);
       } finally {
         if (!cancelled) setWaitlistLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // ─── Testimonials ────────────────────────────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const remote = await testimonialsApi.list() as Testimonial[];
+        if (!cancelled) setTestimonials(remote);
+      } catch (e) {
+        console.warn("Failed to load testimonials from API.", e);
+      } finally {
+        if (!cancelled) setTestimonialsLoading(false);
       }
     })();
     return () => { cancelled = true; };
@@ -479,22 +495,28 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     addActivityLog("Waitlist Entry Removed", id);
   };
 
-  // ─── Local-only CRUD ────────────────────────────────────────────────────────
-  const addTestimonial = (t: Omit<Testimonial, "id" | "createdAt">) => {
-    setTestimonials(prev => [...prev, { ...t, id: `t_${Date.now()}`, createdAt: new Date().toISOString() }]);
-    addActivityLog("Testimonial Added", t.name);
+  // ─── Testimonial CRUD ────────────────────────────────────────────────────────
+  const addTestimonial = async (t: Omit<Testimonial, "id">) => {
+    const created = await testimonialsApi.create(t as any) as Testimonial;
+    setTestimonials(prev => [...prev, created]);
+    addActivityLog("Testimonial Added", created.author);
+    return created;
   };
 
-  const updateTestimonial = (t: Testimonial) => {
-    setTestimonials(prev => prev.map(x => (x.id === t.id ? t : x)));
-    addActivityLog("Testimonial Updated", t.name);
+  const updateTestimonial = async (id: string, t: Partial<Omit<Testimonial, "id">>) => {
+    const updated = await testimonialsApi.update(id, t as any) as Testimonial;
+    setTestimonials(prev => prev.map(x => (x.id === id ? updated : x)));
+    addActivityLog("Testimonial Updated", updated.author);
+    return updated;
   };
 
-  const deleteTestimonial = (id: string) => {
+  const deleteTestimonial = async (id: string) => {
+    await testimonialsApi.remove(id);
     setTestimonials(prev => prev.filter(x => x.id !== id));
     addActivityLog("Testimonial Deleted", id);
   };
 
+  // ─── Local-only CRUD ────────────────────────────────────────────────────────
   const addContactMessage = (m: Omit<ContactMessage, "id" | "createdAt" | "read" | "replied">) => {
     setContactMessages(prev => [
       ...prev,
@@ -562,6 +584,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         customersLoading,
         blogLoading,
         waitlistLoading,
+        testimonialsLoading,
         addProduct,
         updateProduct,
         deleteProduct,

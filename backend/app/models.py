@@ -212,3 +212,20 @@ class BlogPostUpdate(BaseModel):
 
 class BlogPostOut(BlogPostBase):
     id: str
+
+
+class TestimonialBase(BaseModel):
+    text: str
+    author: str
+    rating: float = Field(default=5.0, ge=0, le=5)
+
+class TestimonialCreate(TestimonialBase):
+    pass
+
+class TestimonialUpdate(BaseModel):
+    text: Optional[str] = None
+    author: Optional[str] = None
+    rating: Optional[float] = Field(default=None, ge=0, le=5)
+
+class TestimonialOut(TestimonialBase):
+    id: str
