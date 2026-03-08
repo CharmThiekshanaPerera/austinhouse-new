@@ -6,8 +6,17 @@ import LazyImage from "@/components/LazyImage";
 
 import { useData } from "@/contexts/DataContext";
 
+const MemberSkeleton = () => (
+  <div className="flex flex-col animate-pulse">
+    <div className="rounded-lg h-80 bg-muted mb-4" />
+    <div className="h-4 bg-muted rounded w-2/3 mb-2" />
+    <div className="h-3 bg-muted rounded w-1/2 mb-2" />
+    <div className="h-3 bg-muted rounded w-full" />
+  </div>
+);
+
 const TeamSection = () => {
-  const { staff } = useData();
+  const { staff, staffLoading } = useData();
 
   return (
     <section className="py-20 lg:py-32 bg-secondary/50">
@@ -24,7 +33,11 @@ const TeamSection = () => {
           </h2>
         </motion.div>
 
-        {staff.length === 0 ? (
+        {staffLoading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[...Array(4)].map((_, i) => <MemberSkeleton key={i} />)}
+          </div>
+        ) : staff.length === 0 ? (
           <div className="text-center text-muted-foreground font-body">
             No team members added yet. Check back soon!
           </div>

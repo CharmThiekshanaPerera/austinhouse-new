@@ -146,6 +146,8 @@ interface DataContextType {
   revenueEntries: RevenueEntry[];
   activityLogs: ActivityLog[];
   // Loading states
+  servicesLoading: boolean;
+  productsLoading: boolean;
   bookingsLoading: boolean;
   staffLoading: boolean;
   customersLoading: boolean;
@@ -219,6 +221,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
 
   // Loading states
+  const [servicesLoading, setServicesLoading] = useState(true);
+  const [productsLoading, setProductsLoading] = useState(true);
   const [bookingsLoading, setBookingsLoading] = useState(true);
   const [staffLoading, setStaffLoading] = useState(true);
   const [customersLoading, setCustomersLoading] = useState(true);
@@ -240,6 +244,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         if (!cancelled) setProducts(remote);
       } catch (e) {
         console.warn("Failed to load products from API.", e);
+      } finally {
+        if (!cancelled) setProductsLoading(false);
       }
     })();
     return () => { cancelled = true; };
@@ -254,6 +260,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         if (!cancelled) setServices(remote);
       } catch (e) {
         console.warn("Failed to load services from API.", e);
+      } finally {
+        if (!cancelled) setServicesLoading(false);
       }
     })();
     return () => { cancelled = true; };
@@ -579,6 +587,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         newsletterSubscribers,
         revenueEntries,
         activityLogs,
+        servicesLoading,
+        productsLoading,
         bookingsLoading,
         staffLoading,
         customersLoading,

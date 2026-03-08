@@ -8,7 +8,7 @@ import { useData } from "@/contexts/DataContext";
 
 const TestimonialsSection = () => {
   const [current, setCurrent] = useState(0);
-  const { testimonials } = useData();
+  const { testimonials, testimonialsLoading } = useData();
 
   const next = useCallback(() => setCurrent((prev) => (prev + 1) % (testimonials.length || 1)), [testimonials.length]);
   const prev = () => setCurrent((prev) => (prev - 1 + testimonials.length) % (testimonials.length || 1));
@@ -34,7 +34,14 @@ const TestimonialsSection = () => {
           </h2>
         </motion.div>
 
-        {testimonials.length === 0 ? (
+        {testimonialsLoading ? (
+          <div className="max-w-3xl mx-auto text-center animate-pulse space-y-4">
+            <div className="w-12 h-12 bg-gold/20 rounded-full mx-auto" />
+            <div className="h-5 bg-cream/10 rounded w-3/4 mx-auto" />
+            <div className="h-5 bg-cream/10 rounded w-2/3 mx-auto" />
+            <div className="h-3 bg-gold/20 rounded w-1/4 mx-auto mt-4" />
+          </div>
+        ) : testimonials.length === 0 ? (
           <div className="text-center text-cream/60 font-body py-12">
             No testimonials added yet. Share your experience with us!
           </div>

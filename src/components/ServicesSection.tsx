@@ -1,16 +1,22 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import LazyImage from "@/components/LazyImage";
-import facialImg from "@/assets/facial-treatment.jpg";
-import spaImg from "@/assets/spa-environment.jpg";
-import productsImg from "@/assets/products.jpg";
-
-// Fallback data removed — we use live data from useData()
-
 import { useData } from "@/contexts/DataContext";
 
+const ServiceCardSkeleton = () => (
+  <div className="bg-card rounded-lg overflow-hidden shadow-lg flex flex-col animate-pulse">
+    <div className="h-64 bg-muted" />
+    <div className="p-6 flex flex-col gap-3 flex-1">
+      <div className="h-4 bg-muted rounded w-3/4" />
+      <div className="h-3 bg-muted rounded w-full" />
+      <div className="h-3 bg-muted rounded w-5/6" />
+      <div className="h-3 bg-muted rounded w-1/3 mt-auto" />
+    </div>
+  </div>
+);
+
 const ServicesSection = () => {
-  const { services } = useData();
+  const { services, servicesLoading } = useData();
   const featuredServices = services.slice(0, 3);
 
   return (
@@ -28,7 +34,11 @@ const ServicesSection = () => {
           </h2>
         </motion.div>
 
-        {featuredServices.length === 0 ? (
+        {servicesLoading ? (
+          <div className="grid md:grid-cols-3 gap-8">
+            {[...Array(3)].map((_, i) => <ServiceCardSkeleton key={i} />)}
+          </div>
+        ) : featuredServices.length === 0 ? (
           <div className="text-center text-muted-foreground font-body">
             No featured services added yet. Check back soon!
           </div>
