@@ -32,7 +32,7 @@ const emptyForm = {
 };
 
 const AdminBookings = () => {
-  const { bookings, addBooking, updateBooking, deleteBooking, bookingsLoading } = useData();
+  const { bookings, addBooking, updateBooking, deleteBooking, bookingsLoading, services, staff } = useData();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -43,6 +43,10 @@ const AdminBookings = () => {
   const monthEnd = endOfMonth(currentMonth);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
   const startDay = getDay(monthStart);
+
+  // Build lookup maps so booking cards show human-readable names
+  const serviceMap = Object.fromEntries(services.map(s => [s.id, s.title]));
+  const staffMap = Object.fromEntries(staff.map(s => [s.id, s.name]));
 
   const getBookingsForDate = (date: Date) =>
     bookings.filter(b => b.date && isSameDay(parseISO(b.date), date));
@@ -123,14 +127,64 @@ const AdminBookings = () => {
           <CardHeader><CardTitle className="font-display text-lg">New Booking</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Input placeholder="Customer Name *" value={form.customer_name} onChange={e => setForm(p => ({ ...p, customer_name: e.target.value }))} />
-              <Input placeholder="Customer Email *" type="email" value={form.customer_email} onChange={e => setForm(p => ({ ...p, customer_email: e.target.value }))} />
-              <Input placeholder="Service ID *" value={form.service_id} onChange={e => setForm(p => ({ ...p, service_id: e.target.value }))} />
-              <Input placeholder="Staff ID (optional)" value={form.staff_id} onChange={e => setForm(p => ({ ...p, staff_id: e.target.value }))} />
-              <Input type="date" value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
-              <Input type="time" value={form.time} onChange={e => setForm(p => ({ ...p, time: e.target.value }))} />
+              <Input
+                placeholder="Customer Name *"
+                value={form.customer_name}
+                onChange={e => setForm(p => ({ ...p, customer_name: e.target.value }))}
+                className="bg-background"
+              />
+              <Input
+                placeholder="Customer Email *"
+                type="email"
+                value={form.customer_email}
+                onChange={e => setForm(p => ({ ...p, customer_email: e.target.value }))}
+                className="bg-background"
+              />
+
+              {/* ── Live service dropdown ── */}
+              <select
+                value={form.service_id}
+                onChange={e => setForm(p => ({ ...p, service_id: e.target.value }))}
+                className="w-full px-3 py-2 bg-background border border-border rounded-md font-body text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              >
+                <option value="">Select Service *</option>
+                {services.map(s => (
+                  <option key={s.id} value={s.id}>{s.title} — {s.duration} · {s.price}</option>
+                ))}
+              </select>
+
+              {/* ── Live staff dropdown ── */}
+              <select
+                value={form.staff_id}
+                onChange={e => setForm(p => ({ ...p, staff_id: e.target.value }))}
+                className="w-full px-3 py-2 bg-background border border-border rounded-md font-body text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              >
+                <option value="">Assign Staff (optional)</option>
+                {staff.map(s => (
+                  <option key={s.id} value={s.id}>{s.name} — {s.role}</option>
+                ))}
+              </select>
+
+              <Input
+                type="date"
+                value={form.date}
+                onChange={e => setForm(p => ({ ...p, date: e.target.value }))}
+                className="bg-background"
+              />
+              <Input
+                type="time"
+                value={form.time}
+                onChange={e => setForm(p => ({ ...p, time: e.target.value }))}
+                className="bg-background"
+              />
             </div>
-            <Textarea placeholder="Notes (optional)" value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} rows={2} />
+            <Textarea
+              placeholder="Notes (optional)"
+              value={form.notes}
+              onChange={e => setForm(p => ({ ...p, notes: e.target.value }))}
+              rows={2}
+              className="bg-background"
+            />
             <div className="flex gap-2">
               <Button onClick={handleCreate} disabled={saving} className="bg-gold-gradient text-primary-foreground font-body text-xs uppercase">
                 {saving ? <Loader2 className="animate-spin mr-2" size={14} /> : null} Create
@@ -204,7 +258,13 @@ const AdminBookings = () => {
                               <config.icon size={12} className="mr-1" />{config.label}
                             </Badge>
                           </div>
-                          <p className="text-muted-foreground font-body text-sm">{b.customer_email} · {b.time} · Service: {b.service_id}</p>
+                          <p className="text-muted-foreground font-body text-sm">
+                            {b.customer_email} · {b.time}
+                          </p>
+                          <p className="text-muted-foreground font-body text-sm">
+                            Service: <span className="font-medium text-foreground">{serviceMap[b.service_id] ?? b.service_id}</span>
+                            {b.staff_id && <> · Staff: <span className="font-medium text-foreground">{staffMap[b.staff_id] ?? b.staff_id}</span></>}
+                          </p>
                           {b.notes && <p className="text-muted-foreground font-body text-xs italic">{b.notes}</p>}
                         </div>
                         <div className="flex gap-1 flex-wrap">
@@ -242,6 +302,10 @@ const AdminBookings = () => {
                       </div>
                       <p className="text-muted-foreground font-body text-xs mt-1">
                         {b.customer_email} · {b.date ? format(parseISO(b.date), "MMM d, yyyy") : "N/A"} · {b.time}
+                      </p>
+                      <p className="text-muted-foreground font-body text-xs">
+                        {serviceMap[b.service_id] ?? b.service_id}
+                        {b.staff_id && ` · ${staffMap[b.staff_id] ?? b.staff_id}`}
                       </p>
                     </div>
                     <Button size="sm" variant="destructive" onClick={() => handleDelete(b)}><Trash2 size={14} /></Button>

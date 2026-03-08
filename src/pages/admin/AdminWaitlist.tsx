@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,15 +18,18 @@ const emptyForm = {
 };
 
 const AdminWaitlist = () => {
-  const { waitlistEntries, addWaitlistEntry, deleteWaitlistEntry, waitlistLoading } = useData();
+  const { waitlistEntries, addWaitlistEntry, deleteWaitlistEntry, waitlistLoading, services } = useData();
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
 
+  // Build a quick lookup map for displaying service names
+  const serviceMap = Object.fromEntries(services.map(s => [s.id, s.title]));
+
   const handleAdd = async () => {
     if (!form.name || !form.email || !form.preferred_date || !form.service_id) {
-      toast({ title: "Missing fields", description: "Name, email, preferred date, and service ID are required.", variant: "destructive" });
+      toast({ title: "Missing fields", description: "Name, email, preferred date, and service are required.", variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -41,7 +43,8 @@ const AdminWaitlist = () => {
         notes: form.notes || null,
       });
       toast({ title: "Added ✨", description: `${form.name} added to waitlist.` });
-      setForm(emptyForm); setShowForm(false);
+      setForm(emptyForm);
+      setShowForm(false);
     } catch {
       toast({ title: "Error", description: "Failed to add to waitlist.", variant: "destructive" });
     } finally {
@@ -54,7 +57,7 @@ const AdminWaitlist = () => {
       await deleteWaitlistEntry(entry.id);
       toast({
         title: reason === "booked" ? "Appointment Booked" : "Removed from Waitlist",
-        description: `${entry.name} has been ${reason === "booked" ? "booked for service " + entry.service_id : "removed"}`,
+        description: `${entry.name} has been ${reason === "booked" ? "booked for " + (serviceMap[entry.service_id] ?? entry.service_id) : "removed"}`,
       });
     } catch {
       toast({ title: "Error", description: "Failed to remove entry.", variant: "destructive" });
@@ -91,13 +94,52 @@ const AdminWaitlist = () => {
           <CardHeader><CardTitle className="font-display text-lg">Add to Waitlist</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Input placeholder="Customer Name *" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
-              <Input placeholder="Email *" type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} />
-              <Input placeholder="Phone (optional)" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} />
-              <Input placeholder="Service ID *" value={form.service_id} onChange={e => setForm(p => ({ ...p, service_id: e.target.value }))} />
-              <Input type="date" value={form.preferred_date} onChange={e => setForm(p => ({ ...p, preferred_date: e.target.value }))} />
+              <Input
+                placeholder="Customer Name *"
+                value={form.name}
+                onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                className="bg-background"
+              />
+              <Input
+                placeholder="Email *"
+                type="email"
+                value={form.email}
+                onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+                className="bg-background"
+              />
+              <Input
+                placeholder="Phone (optional)"
+                value={form.phone}
+                onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
+                className="bg-background"
+              />
+
+              {/* ── Live service dropdown ── */}
+              <select
+                value={form.service_id}
+                onChange={e => setForm(p => ({ ...p, service_id: e.target.value }))}
+                className="w-full px-3 py-2 bg-background border border-border rounded-md font-body text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              >
+                <option value="">Select Service *</option>
+                {services.map(s => (
+                  <option key={s.id} value={s.id}>{s.title} — {s.duration} · {s.price}</option>
+                ))}
+              </select>
+
+              <Input
+                type="date"
+                value={form.preferred_date}
+                onChange={e => setForm(p => ({ ...p, preferred_date: e.target.value }))}
+                className="bg-background"
+              />
             </div>
-            <Textarea placeholder="Notes (optional)" value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} rows={2} />
+            <Textarea
+              placeholder="Notes (optional)"
+              value={form.notes}
+              onChange={e => setForm(p => ({ ...p, notes: e.target.value }))}
+              rows={2}
+              className="bg-background"
+            />
             <div className="flex gap-2">
               <Button onClick={handleAdd} disabled={saving} className="bg-gold-gradient text-primary-foreground font-body text-xs uppercase">
                 {saving ? <Loader2 className="animate-spin mr-2" size={14} /> : null} Add
@@ -152,7 +194,7 @@ const AdminWaitlist = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="font-body">Customer</TableHead>
-                  <TableHead className="font-body">Service ID</TableHead>
+                  <TableHead className="font-body">Service</TableHead>
                   <TableHead className="font-body">Preferred Date</TableHead>
                   <TableHead className="font-body">Notes</TableHead>
                   <TableHead className="font-body">Actions</TableHead>
@@ -168,7 +210,10 @@ const AdminWaitlist = () => {
                         {w.phone && <p className="text-xs text-muted-foreground flex items-center gap-1"><Phone size={10} /> {w.phone}</p>}
                       </div>
                     </TableCell>
-                    <TableCell className="font-body text-foreground font-mono text-xs">{w.service_id}</TableCell>
+                    {/* Resolve service_id → name */}
+                    <TableCell className="font-body text-foreground text-sm">
+                      {serviceMap[w.service_id] ?? <span className="font-mono text-xs text-muted-foreground">{w.service_id}</span>}
+                    </TableCell>
                     <TableCell className="font-body text-muted-foreground text-sm">{w.preferred_date}</TableCell>
                     <TableCell className="font-body text-muted-foreground text-xs max-w-[140px] truncate">{w.notes ?? "—"}</TableCell>
                     <TableCell>
