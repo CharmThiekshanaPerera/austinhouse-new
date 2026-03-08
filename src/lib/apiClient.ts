@@ -7,14 +7,18 @@ export async function apiRequest<TResponse>(
   options?: {
     method?: HttpMethod;
     body?: unknown;
+    headers?: Record<string, string>;
   },
 ): Promise<TResponse> {
   const method = options?.method ?? "GET";
   console.log(`[API Request] ${method} ${path}`, options?.body || "");
 
-  const res = await fetch(`${baseUrl}${path}`, {
+  const headers: Record<string, string> = { ...(options?.headers ?? {}) };
+  if (options?.body) headers["Content-Type"] = "application/json";
+
+  const res = await fetch(`${baseUrl}/api${path}`, {
     method,
-    headers: options?.body ? { "Content-Type": "application/json" } : undefined,
+    headers,
     body: options?.body ? JSON.stringify(options.body) : undefined,
   });
 
@@ -26,4 +30,5 @@ export async function apiRequest<TResponse>(
   if (res.status === 204) return undefined as TResponse;
   return (await res.json()) as TResponse;
 }
+
 

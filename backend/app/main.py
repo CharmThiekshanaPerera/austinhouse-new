@@ -17,6 +17,7 @@ from app.routes.customers import router as customers_router
 from app.routes.waitlist import router as waitlist_router
 from app.routes.blog import router as blog_router
 from app.routes.testimonials import router as testimonials_router
+from app.routes.auth import router as auth_router
 from app.settings import settings
 from pathlib import Path
 
@@ -41,6 +42,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router, prefix="/api")
 app.include_router(services_router, prefix="/api")
 app.include_router(products_router, prefix="/api")
 app.include_router(inventory_router, prefix="/api")
