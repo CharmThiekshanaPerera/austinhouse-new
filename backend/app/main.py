@@ -11,6 +11,11 @@ from app.routes.services import router as services_router
 from app.routes.products import router as products_router
 from app.routes.inventory import router as inventory_router
 from app.routes.uploads import router as uploads_router
+from app.routes.bookings import router as bookings_router
+from app.routes.staff import router as staff_router
+from app.routes.customers import router as customers_router
+from app.routes.waitlist import router as waitlist_router
+from app.routes.blog import router as blog_router
 from app.settings import settings
 from pathlib import Path
 
@@ -24,7 +29,7 @@ async def lifespan(app: FastAPI):
         await db.disconnect()
 
 
-app = FastAPI(title="Bright Living API", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="Bright Living API", version="0.1.0", lifespan=lifespan, redirect_slashes=False)
 
 allowed_origins = [o.strip() for o in settings.allowed_origins.split(",") if o.strip()]
 app.add_middleware(
@@ -39,6 +44,11 @@ app.include_router(services_router, prefix="/api")
 app.include_router(products_router, prefix="/api")
 app.include_router(inventory_router, prefix="/api")
 app.include_router(uploads_router, prefix="/api")
+app.include_router(bookings_router, prefix="/api")
+app.include_router(staff_router, prefix="/api")
+app.include_router(customers_router, prefix="/api")
+app.include_router(waitlist_router, prefix="/api")
+app.include_router(blog_router, prefix="/api")
 
 uploads_dir = Path(__file__).resolve().parents[1] / "uploads"
 uploads_dir.mkdir(parents=True, exist_ok=True)
