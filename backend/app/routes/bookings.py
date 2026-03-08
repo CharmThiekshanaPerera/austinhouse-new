@@ -6,7 +6,7 @@ import uuid
 
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
 
-@router.get("/", response_model=List[BookingOut])
+@router.get("", response_model=List[BookingOut])
 async def get_all_bookings():
     cursor = db.get_db().bookings.find()
     booking_list = await cursor.to_list(length=100)
@@ -22,7 +22,7 @@ async def get_booking(booking_id: str):
         return booking
     raise HTTPException(status_code=404, detail="Booking not found")
 
-@router.post("/", response_model=BookingOut, status_code=201)
+@router.post("", response_model=BookingOut, status_code=201)
 async def create_booking(booking: BookingCreate):
     booking_dict = booking.model_dump()
     booking_dict["_id"] = str(uuid.uuid4())

@@ -6,7 +6,7 @@ import uuid
 
 router = APIRouter(prefix="/staff", tags=["Staff"])
 
-@router.get("/", response_model=List[StaffOut])
+@router.get("", response_model=List[StaffOut])
 async def get_all_staff():
     cursor = db.get_db().staff.find()
     staff_list = await cursor.to_list(length=100)
@@ -22,7 +22,7 @@ async def get_staff(staff_id: str):
         return staff
     raise HTTPException(status_code=404, detail="Staff not found")
 
-@router.post("/", response_model=StaffOut, status_code=201)
+@router.post("", response_model=StaffOut, status_code=201)
 async def create_staff(staff: StaffCreate):
     staff_dict = staff.model_dump()
     staff_dict["_id"] = str(uuid.uuid4())

@@ -6,7 +6,7 @@ import uuid
 
 router = APIRouter(prefix="/waitlist", tags=["Waitlist"])
 
-@router.get("/", response_model=List[WaitlistEntryOut])
+@router.get("", response_model=List[WaitlistEntryOut])
 async def get_all_waitlist_entries():
     cursor = db.get_db().waitlist.find()
     waitlist_entries = await cursor.to_list(length=100)
@@ -22,7 +22,7 @@ async def get_waitlist_entry(entry_id: str):
         return entry
     raise HTTPException(status_code=404, detail="Waitlist entry not found")
 
-@router.post("/", response_model=WaitlistEntryOut, status_code=201)
+@router.post("", response_model=WaitlistEntryOut, status_code=201)
 async def create_waitlist_entry(entry: WaitlistEntryCreate):
     entry_dict = entry.model_dump()
     entry_dict["_id"] = str(uuid.uuid4())

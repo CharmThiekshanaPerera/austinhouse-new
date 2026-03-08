@@ -7,7 +7,7 @@ from datetime import datetime
 
 router = APIRouter(prefix="/customers", tags=["Customers"])
 
-@router.get("/", response_model=List[CustomerOut])
+@router.get("", response_model=List[CustomerOut])
 async def get_all_customers():
     cursor = db.get_db().customers.find()
     customer_list = await cursor.to_list(length=100)
@@ -23,7 +23,7 @@ async def get_customer(customer_id: str):
         return customer
     raise HTTPException(status_code=404, detail="Customer not found")
 
-@router.post("/", response_model=CustomerOut, status_code=201)
+@router.post("", response_model=CustomerOut, status_code=201)
 async def create_customer(customer: CustomerCreate):
     customer_dict = customer.model_dump()
     customer_dict["_id"] = str(uuid.uuid4())

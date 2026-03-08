@@ -6,7 +6,7 @@ import uuid
 
 router = APIRouter(prefix="/testimonials", tags=["Testimonials"])
 
-@router.get("/", response_model=List[TestimonialOut])
+@router.get("", response_model=List[TestimonialOut])
 async def get_all_testimonials():
     cursor = db.get_db().testimonials.find()
     testimonials = await cursor.to_list(length=100)
@@ -22,7 +22,7 @@ async def get_testimonial(t_id: str):
         return t
     raise HTTPException(status_code=404, detail="Testimonial not found")
 
-@router.post("/", response_model=TestimonialOut, status_code=201)
+@router.post("", response_model=TestimonialOut, status_code=201)
 async def create_testimonial(t_in: TestimonialCreate):
     t_dict = t_in.model_dump()
     t_dict["_id"] = str(uuid.uuid4())

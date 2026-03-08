@@ -6,7 +6,7 @@ import uuid
 
 router = APIRouter(prefix="/blog", tags=["Blog"])
 
-@router.get("/", response_model=List[BlogPostOut])
+@router.get("", response_model=List[BlogPostOut])
 async def get_all_blog_posts():
     cursor = db.get_db().blog.find()
     blog_posts = await cursor.to_list(length=100)
@@ -22,7 +22,7 @@ async def get_blog_post(post_id: str):
         return post
     raise HTTPException(status_code=404, detail="Blog post not found")
 
-@router.post("/", response_model=BlogPostOut, status_code=201)
+@router.post("", response_model=BlogPostOut, status_code=201)
 async def create_blog_post(post: BlogPostCreate):
     post_dict = post.model_dump()
     post_dict["_id"] = str(uuid.uuid4())

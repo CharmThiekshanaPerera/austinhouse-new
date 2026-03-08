@@ -9,8 +9,11 @@ export async function apiRequest<TResponse>(
     body?: unknown;
   },
 ): Promise<TResponse> {
+  const method = options?.method ?? "GET";
+  console.log(`[API Request] ${method} ${path}`, options?.body || "");
+
   const res = await fetch(`${baseUrl}${path}`, {
-    method: options?.method ?? "GET",
+    method,
     headers: options?.body ? { "Content-Type": "application/json" } : undefined,
     body: options?.body ? JSON.stringify(options.body) : undefined,
   });
