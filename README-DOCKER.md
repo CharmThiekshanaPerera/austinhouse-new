@@ -1,63 +1,90 @@
-# Local Docker Development Guide
+# 🐳 Austin House Docker Deployment Guide
 
-This repository contains full Docker Compose support to allow you to easily spin up a perfect local replica of the production DigitalOcean environment.
+This guide provides everything you need to build, test, and deploy the entire Austin House ecosystem using Docker.
 
-## Architecture
+## 🏗️ Architecture
 
-Running Docker Compose spins up two interconnected containers:
+The Docker setup consists of two main containers:
 
-1. **`austinhouse_backend`**: A Python container running the FastAPI backend internally on port 8000.
-2. **`austinhouse_frontend`**: A multi-stage container that builds the React application and serves it via a lightweight Nginx web server. This Nginx instance is also configured to natively proxy any frontend requests starting with `/api/` directly to the `backend` container!
+1. **`austinhouse_backend`**: FastAPI Python server.
+2. **`austinhouse_frontend`**: Nginx server serving the built React assets and proxying `/api` traffic.
 
 ---
 
-## 1. How to Test with Docker
+## 💻 Local Development & Testing
 
-### Prerequisites
+### 1. Pre-requisites
 
-Make sure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running on your computer.
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running.
+- Ensure ports **80** and **8000** are available.
 
-### Quick Start
+### 2. Getting Started
 
-To spin up the entire application stack, simply open a terminal in this root directory (`austinhouse-new`) and execute:
+To boot the entire application stack:
 
 ```bash
 docker-compose up --build -d
 ```
 
-**What happens?**
+### 3. Database Seeding
 
-- `-d` runs the containers in detached (background) mode.
-- `--build` forces Docker to completely rebuild the React frontend (this make take a minute or two on the first run).
-- Docker maps port `80` on your machine to the Nginx frontend container.
-
-### Testing the Interface
-
-Once the terminal finishes and the containers are running:
-
-1. Open your browser.
-2. Navigate directly to **`http://localhost`** (you no longer need `:8080`).
-3. You should see the public Austin House website!
-4. Navigate to **`http://localhost/admin`** to log in to the admin panel using `admin` / `admin123`.
-
-To test the backend API docs directly, navigate to **`http://localhost:8000/api/docs`**.
-
----
-
-## 2. Environment Variables
-
-The `docker-compose.yml` file defaults to injecting dummy secrets and database paths into the backend.
-
-If your backend container begins throwing MongoDB connection errors, please open `docker-compose.yml` and replace the placeholder `MONGODB_URI` string with your real MongoDB Atlas connection string before running `docker-compose up -d`.
-
----
-
-## 3. Stopping the Application
-
-To shut down the full-stack replica application, run:
+After the containers are running, you must seed the database to create the default admin user and initial data:
 
 ```bash
-docker-compose down
+docker exec -it austinhouse_backend python seed_data.py
 ```
 
-*(Note: Uploaded images in the admin panel are saved into a persistent Docker Volume `backend_uploads`, so your files are safe even when you shut the server down!).*
+- **Admin Username:** `admin`
+- **Admin Password:** `admin123`
+
+### 4. Accessing the Application
+
+- **Frontend / Website:** [http://localhost](http://localhost)
+- **Admin Panel:** [http://localhost/admin](http://localhost/admin)
+- **API Documentation:** [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
+
+---
+
+## 🚀 Production Deployment (DigitalOcean)
+
+To deploy this containerized setup on your DigitalOcean Droplet:
+
+1. **Clone the Repo:**
+
+    ```bash
+    git clone <your-repo-url> /var/www/austinhouse-new
+    cd /var/www/austinhouse-new
+    ```
+
+2. **Setup Environment Variables:**
+    Ensure `docker-compose.yml` has the correct `MONGODB_URI` and `JWT_SECRET`.
+
+3. **Run with Docker Compose:**
+
+    ```bash
+    docker-compose up --build -d
+    ```
+
+4. **Automated CI/CD:**
+    The project includes a GitHub Actions workflow in `.github/workflows/deploy.yml`. Once you add your `DROPLET_IP`, `DROPLET_USERNAME`, and `DROPLET_SSH_KEY` to GitHub Secrets, every push to `main` will automatically update the containers on your server.
+
+---
+
+## 🛠️ Docker Command Cheat Sheet
+
+| Task | Command |
+| :--- | :--- |
+| **Start everything** | `docker-compose up -d` |
+| **Stop everything** | `docker-compose down` |
+| **Rebuild & Start** | `docker-compose up --build -d` |
+| **Update Python Code** | `docker-compose restart backend` |
+| **Update React Frontend** | `docker-compose up --build -d frontend` |
+| **View Backend Logs** | `docker logs -f austinhouse_backend` |
+| **Reset Database** | `docker exec -it austinhouse_backend python cleandb_all.py` |
+| **Seed Data** | `docker exec -it austinhouse_backend python seed_data.py` |
+
+---
+
+## 📁 Persistence
+
+Uploaded images and files are stored in a persistent Docker volume called `backend_uploads`. This ensures your media files remain safe even if you stop or rebuild the containers.
