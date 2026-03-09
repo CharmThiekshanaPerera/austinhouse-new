@@ -16,7 +16,7 @@ export async function apiRequest<TResponse>(
   const headers: Record<string, string> = { ...(options?.headers ?? {}) };
   if (options?.body) headers["Content-Type"] = "application/json";
 
-  const res = await fetch(`${baseUrl}/api${path}`, {
+  const res = await fetch(`${baseUrl}${path}`, {
     method,
     headers,
     body: options?.body ? JSON.stringify(options.body) : undefined,
