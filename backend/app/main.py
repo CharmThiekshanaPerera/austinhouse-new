@@ -58,9 +58,12 @@ app.include_router(blog_router, prefix="/api")
 app.include_router(messages_router, prefix="/api")
 app.include_router(gallery_router, prefix="/api")
 
-uploads_dir = Path(__file__).resolve().parents[1] / "uploads"
-uploads_dir.mkdir(parents=True, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
+try:
+    uploads_dir = Path(__file__).resolve().parents[1] / "uploads"
+    uploads_dir.mkdir(parents=True, exist_ok=True)
+    app.mount("/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
+except Exception as e:
+    print(f"Warning: Could not create or mount uploads directory: {e}")
 
 
 @app.get("/health")

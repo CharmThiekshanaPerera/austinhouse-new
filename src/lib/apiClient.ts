@@ -1,6 +1,6 @@
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-const baseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "http://127.0.0.1:8000";
+const baseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
 
 export async function apiRequest<TResponse>(
   path: string,
