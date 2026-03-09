@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { CalendarIcon, X } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { useData } from "@/contexts/DataContext";
@@ -18,15 +18,6 @@ interface BookingModalProps {
   preselectedService?: string;
 }
 
-const treatmentOptions = [
-  "Signature Gold Facial",
-  "Laser Hair Removal",
-  "Luxury Manicure & Pedicure",
-  "Full Body Waxing",
-  "Microdermabrasion",
-  "Relaxation Massage Therapy",
-];
-
 const timeSlots = [
   "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
   "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM",
@@ -34,32 +25,66 @@ const timeSlots = [
 
 const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalProps) => {
   const [date, setDate] = useState<Date>();
-  const [treatment, setTreatment] = useState(preselectedService || "");
+  const [serviceId, setServiceId] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const { addBooking } = useData();
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const { addBooking, services } = useData();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Pre-select service by title match when preselectedService prop changes
+  useEffect(() => {
+    if (preselectedService && services.length > 0) {
+      const match = services.find(s =>
+        s.title.toLowerCase() === preselectedService.toLowerCase()
+      );
+      if (match) setServiceId(match.id);
+    }
+  }, [preselectedService, services]);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!open) {
+      setDate(undefined);
+      setServiceId("");
+      setTimeSlot("");
+      setName("");
+      setEmail("");
+    }
+  }, [open]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addBooking({
-      name,
-      phone,
-      treatment,
-      date: date ? date.toISOString() : "",
-      timeSlot,
-      status: "pending",
-    });
-    toast({
-      title: "Booking Confirmed! ✨",
-      description: `${treatment} on ${date ? format(date, "PPP") : ""} at ${timeSlot}. We'll contact you shortly to confirm.`,
-    });
-    onOpenChange(false);
-    setDate(undefined);
-    setTreatment("");
-    setTimeSlot("");
-    setName("");
-    setPhone("");
+    if (!date || !serviceId || !timeSlot || !name || !email) return;
+
+    setSubmitting(true);
+    try {
+      await addBooking({
+        customer_name: name,
+        customer_email: email,
+        service_id: serviceId,
+        staff_id: null,
+        date: format(date, "yyyy-MM-dd"),
+        time: timeSlot,
+        status: "Pending",
+        notes: null,
+      });
+
+      const svcTitle = services.find(s => s.id === serviceId)?.title ?? "your treatment";
+      toast({
+        title: "Booking Confirmed! ✨",
+        description: `${svcTitle} on ${format(date, "PPP")} at ${timeSlot}. We'll contact you shortly.`,
+      });
+      onOpenChange(false);
+    } catch (err) {
+      toast({
+        title: "Booking Failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -72,18 +97,20 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 mt-4">
-          {/* Treatment Selection */}
+          {/* Treatment Selection — live from API */}
           <div>
             <label className="block text-sm font-body text-muted-foreground mb-2">Select Treatment</label>
             <select
               required
-              value={treatment}
-              onChange={(e) => setTreatment(e.target.value)}
+              value={serviceId}
+              onChange={(e) => setServiceId(e.target.value)}
               className="w-full px-4 py-3 bg-background border border-border rounded-sm font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none"
             >
-              <option value="">Choose a treatment...</option>
-              {treatmentOptions.map((t) => (
-                <option key={t} value={t}>{t}</option>
+              <option value="">Choose a treatment…</option>
+              {services.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.title} — {s.duration} · {s.price}
+                </option>
               ))}
             </select>
           </div>
@@ -139,7 +166,7 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
             </div>
           </div>
 
-          {/* Name & Phone */}
+          {/* Name & Email */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-body text-muted-foreground mb-2">Your Name</label>
@@ -153,29 +180,26 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
               />
             </div>
             <div>
-              <label className="block text-sm font-body text-muted-foreground mb-2">Phone</label>
+              <label className="block text-sm font-body text-muted-foreground mb-2">Email</label>
               <input
-                type="tel"
+                type="email"
                 required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 bg-background border border-border rounded-sm font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                placeholder="+94..."
+                placeholder="you@example.com"
               />
             </div>
           </div>
 
           <button
             type="submit"
-            disabled={!date || !treatment || !timeSlot}
-            className="w-full py-4 bg-gold-gradient text-primary-foreground font-body font-bold tracking-wider uppercase text-sm rounded-sm shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!date || !serviceId || !timeSlot || !name || !email || submitting}
+            className="w-full py-4 bg-gold-gradient text-primary-foreground font-body font-bold tracking-wider uppercase text-sm rounded-sm shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Confirm Booking
+            {submitting && <Loader2 size={16} className="animate-spin" />}
+            {submitting ? "Confirming…" : "Confirm Booking"}
           </button>
-
-          <p className="text-center text-xs text-muted-foreground font-body">
-            This is a demo booking. No actual appointment will be scheduled.
-          </p>
         </form>
       </DialogContent>
     </Dialog>

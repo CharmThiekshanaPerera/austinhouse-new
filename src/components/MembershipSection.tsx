@@ -1,17 +1,42 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useData } from "@/contexts/DataContext";
+import { toast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 const MembershipSection = () => {
+  const { addCustomer } = useData();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Thank you for your interest! We'll be in touch soon.");
-    setFormData({ name: "", phone: "", email: "" });
+    setLoading(true);
+    try {
+      await addCustomer({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        total_spent: 0,
+      });
+      toast({
+        title: "Welcome to the Club! ✨",
+        description: "Thank you for joining. We'll be in touch soon with your membership details.",
+      });
+      setFormData({ name: "", phone: "", email: "" });
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to sign up. Please try again or contact us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -85,9 +110,11 @@ const MembershipSection = () => {
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-4 bg-gold-gradient text-primary-foreground font-body font-bold tracking-wider uppercase text-sm rounded-sm shadow-gold hover:opacity-90 transition-opacity"
+                  disabled={loading}
+                  className="w-full flex justify-center items-center py-4 bg-gold-gradient text-primary-foreground font-body font-bold tracking-wider uppercase text-sm rounded-sm shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
-                  Become a Member
+                  {loading ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
+                  {loading ? "Joining..." : "Become a Member"}
                 </button>
               </div>
             </form>

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Send, Loader2 } from "lucide-react";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import SEO from "@/components/SEO";
@@ -19,15 +19,27 @@ const contactInfo = [
 const Contact = () => {
   const { addContactMessage } = useData();
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addContactMessage({ name: form.name, email: form.email, subject: form.subject, message: form.message });
-    toast({
-      title: "Message Sent! ✨",
-      description: "Thank you for reaching out. We'll get back to you within 24 hours.",
-    });
-    setForm({ name: "", email: "", phone: "", subject: "", message: "" });
+    setLoading(true);
+    try {
+      await addContactMessage({ name: form.name, email: form.email, subject: form.subject, message: form.message });
+      toast({
+        title: "Message Sent! ✨",
+        description: "Thank you for reaching out. We'll get back to you within 24 hours.",
+      });
+      setForm({ name: "", email: "", phone: "", subject: "", message: "" });
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -152,10 +164,11 @@ const Contact = () => {
                 </div>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-gold-gradient text-primary-foreground font-body font-bold tracking-wider uppercase text-sm rounded-sm shadow-gold hover:opacity-90 transition-opacity"
+                  disabled={loading}
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-gold-gradient text-primary-foreground font-body font-bold tracking-wider uppercase text-sm rounded-sm shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
-                  <Send size={16} />
-                  Send Message
+                  {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                  {loading ? "Sending..." : "Send Message"}
                 </button>
               </form>
             </motion.div>

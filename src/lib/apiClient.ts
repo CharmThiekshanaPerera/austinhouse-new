@@ -7,20 +7,30 @@ export async function apiRequest<TResponse>(
   options?: {
     method?: HttpMethod;
     body?: unknown;
+    headers?: Record<string, string>;
   },
 ): Promise<TResponse> {
+  const method = options?.method ?? "GET";
+  console.log(`[API Request] ${method} ${path}`, options?.body || "");
+
+  const headers: Record<string, string> = { ...(options?.headers ?? {}) };
+  if (options?.body) headers["Content-Type"] = "application/json";
+
   const res = await fetch(`${baseUrl}${path}`, {
-    method: options?.method ?? "GET",
-    headers: options?.body ? { "Content-Type": "application/json" } : undefined,
+    method,
+    headers,
     body: options?.body ? JSON.stringify(options.body) : undefined,
   });
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`API ${res.status} ${res.statusText}${text ? `: ${text}` : ""}`);
+    const errorMsg = `API ${res.status} ${res.statusText}${text ? `: ${text}` : ""}`;
+    console.error("[API Error]", errorMsg, "Path:", path);
+    throw new Error(errorMsg);
   }
 
   if (res.status === 204) return undefined as TResponse;
   return (await res.json()) as TResponse;
 }
+
 

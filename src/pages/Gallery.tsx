@@ -13,28 +13,11 @@ import nailsAfter from "@/assets/gallery-nails-after.jpg";
 import peelBefore from "@/assets/gallery-peel-before.jpg";
 import peelAfter from "@/assets/gallery-peel-after.jpg";
 
-const galleryItems = [
-  {
-    before: facialBefore,
-    after: facialAfter,
-    title: "Signature Gold Facial",
-    description: "Dramatic improvement in skin clarity, texture, and luminosity after a single session of our signature gold facial treatment.",
-  },
-  {
-    before: nailsBefore,
-    after: nailsAfter,
-    title: "Luxury Manicure",
-    description: "From bare and unpolished to stunning gold-accented nail art — our premium manicure transforms your hands completely.",
-  },
-  {
-    before: peelBefore,
-    after: peelAfter,
-    title: "Chemical Peel Treatment",
-    description: "Visible reduction in blemishes, acne scarring, and uneven texture after our professional chemical peel protocol.",
-  },
-];
+import { useData } from "@/contexts/DataContext";
+import { Loader2 } from "lucide-react";
 
 const Gallery = () => {
+  const { beforeAfterPairs, galleryLoading } = useData();
   return (
     <div className="min-h-screen bg-background">
       <SEO title="Gallery" description="See stunning before & after transformations — facials, nail art, chemical peels and more at Austin House Beauty & Spa, Colombo." canonical="https://bright-living-clone.lovable.app/gallery" ogImage="https://bright-living-clone.lovable.app/og-gallery.jpg" breadcrumbs={[{ name: "Home", url: "https://bright-living-clone.lovable.app/" }, { name: "Gallery", url: "https://bright-living-clone.lovable.app/gallery" }]} />
@@ -60,33 +43,43 @@ const Gallery = () => {
       {/* Before/After Sliders */}
       <section className="py-16 lg:py-24">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="space-y-20">
-            {galleryItems.map((item, index) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7 }}
-                className="grid lg:grid-cols-2 gap-10 items-center"
-              >
-                <div className={index % 2 === 1 ? "lg:order-2" : ""}>
-                  <BeforeAfterSlider beforeImage={item.before} afterImage={item.after} />
-                </div>
-                <div className={index % 2 === 1 ? "lg:order-1" : ""}>
-                  <span className="text-gold uppercase tracking-[0.3em] text-xs font-body">Treatment Result</span>
-                  <h2 className="font-display text-2xl lg:text-3xl font-bold text-foreground mt-2 mb-4">{item.title}</h2>
-                  <p className="text-muted-foreground font-body leading-relaxed mb-6">{item.description}</p>
-                  <Link
-                    to="/services"
-                    className="inline-flex items-center justify-center px-8 py-3 bg-gold-gradient text-primary-foreground font-body font-bold text-sm uppercase tracking-wider rounded-sm shadow-gold hover:opacity-90 transition-opacity"
-                  >
-                    Book This Treatment
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          {galleryLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="animate-spin text-gold" size={48} />
+            </div>
+          ) : beforeAfterPairs.length === 0 ? (
+            <div className="text-center py-20 text-muted-foreground font-body">
+              No before/after treatments available yet.
+            </div>
+          ) : (
+            <div className="space-y-20">
+              {beforeAfterPairs.map((item, index) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.7 }}
+                  className="grid lg:grid-cols-2 gap-10 items-center"
+                >
+                  <div className={index % 2 === 1 ? "lg:order-2" : ""}>
+                    <BeforeAfterSlider beforeImage={item.before_image} afterImage={item.after_image} />
+                  </div>
+                  <div className={index % 2 === 1 ? "lg:order-1" : ""}>
+                    <span className="text-gold uppercase tracking-[0.3em] text-xs font-body">Treatment Result</span>
+                    <h2 className="font-display text-2xl lg:text-3xl font-bold text-foreground mt-2 mb-4">{item.title}</h2>
+                    <p className="text-muted-foreground font-body leading-relaxed mb-6">{item.description}</p>
+                    <Link
+                      to="/services"
+                      className="inline-flex items-center justify-center px-8 py-3 bg-gold-gradient text-primary-foreground font-body font-bold text-sm uppercase tracking-wider rounded-sm shadow-gold hover:opacity-90 transition-opacity"
+                    >
+                      Book This Treatment
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

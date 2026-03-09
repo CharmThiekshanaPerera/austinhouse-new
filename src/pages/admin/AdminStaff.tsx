@@ -1,88 +1,233 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { UserCog, Clock } from "lucide-react";
+import { useData, Staff } from "@/contexts/DataContext";
+import { UserCog, Clock, Plus, Pencil, Trash2, Loader2, Upload, Eye, EyeOff } from "lucide-react";
+import { uploadImage } from "@/lib/uploadsApi";
+
+const STAFF_COLORS = [
+  "bg-purple-500", "bg-blue-500", "bg-green-500", "bg-pink-500",
+  "bg-orange-500", "bg-teal-500", "bg-red-500", "bg-indigo-500",
+];
 
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const hours = ["9AM", "10AM", "11AM", "12PM", "1PM", "2PM", "3PM", "4PM", "5PM", "6PM"];
 
-const initialStaff = [
-  { id: 1, name: "Dr. Elena Rodriguez", role: "Medical Director", available: true, hoursWeek: 40, color: "bg-purple-500" },
-  { id: 2, name: "Maya Chen", role: "Senior Aesthetician", available: true, hoursWeek: 36, color: "bg-blue-500" },
-  { id: 3, name: "Jessica Park", role: "Massage Therapist", available: false, hoursWeek: 0, color: "bg-green-500" },
-  { id: 4, name: "Priya Sharma", role: "Nail Technician", available: true, hoursWeek: 32, color: "bg-pink-500" },
-];
-
-const scheduleData: Record<string, { staff: string; color: string }[]> = {
-  "Mon-9AM": [{ staff: "Elena", color: "bg-purple-500" }],
-  "Mon-10AM": [{ staff: "Elena", color: "bg-purple-500" }, { staff: "Maya", color: "bg-blue-500" }],
-  "Mon-11AM": [{ staff: "Maya", color: "bg-blue-500" }],
-  "Mon-2PM": [{ staff: "Priya", color: "bg-pink-500" }],
-  "Tue-9AM": [{ staff: "Maya", color: "bg-blue-500" }],
-  "Tue-11AM": [{ staff: "Elena", color: "bg-purple-500" }],
-  "Tue-1PM": [{ staff: "Priya", color: "bg-pink-500" }],
-  "Tue-3PM": [{ staff: "Maya", color: "bg-blue-500" }],
-  "Wed-10AM": [{ staff: "Elena", color: "bg-purple-500" }, { staff: "Priya", color: "bg-pink-500" }],
-  "Wed-2PM": [{ staff: "Maya", color: "bg-blue-500" }],
-  "Thu-9AM": [{ staff: "Elena", color: "bg-purple-500" }],
-  "Thu-11AM": [{ staff: "Maya", color: "bg-blue-500" }, { staff: "Priya", color: "bg-pink-500" }],
-  "Thu-4PM": [{ staff: "Elena", color: "bg-purple-500" }],
-  "Fri-10AM": [{ staff: "Maya", color: "bg-blue-500" }],
-  "Fri-1PM": [{ staff: "Priya", color: "bg-pink-500" }],
-  "Fri-3PM": [{ staff: "Elena", color: "bg-purple-500" }],
-  "Sat-9AM": [{ staff: "Maya", color: "bg-blue-500" }, { staff: "Priya", color: "bg-pink-500" }],
-  "Sat-11AM": [{ staff: "Elena", color: "bg-purple-500" }],
-};
+const emptyForm = { name: "", role: "", email: "", phone: "", bio: "", image: "", show_in_frontend: true };
 
 const AdminStaff = () => {
-  const [staff, setStaff] = useState(initialStaff);
+  const { staff, addStaff, updateStaff, deleteStaff, staffLoading } = useData();
   const { toast } = useToast();
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<Staff | null>(null);
+  const [form, setForm] = useState(emptyForm);
+  const [file, setFile] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  const toggleAvailability = (id: number) => {
-    setStaff(prev => prev.map(s => s.id === id ? { ...s, available: !s.available } : s));
-    const member = staff.find(s => s.id === id);
-    toast({ title: "Availability Updated", description: `${member?.name} is now ${member?.available ? "unavailable" : "available"}` });
+  const getInitials = (name: string) =>
+    name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+
+  const getColor = (id: string) =>
+    STAFF_COLORS[Math.abs(id.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)) % STAFF_COLORS.length];
+
+  const openEdit = (s: Staff) => {
+    setEditing(s);
+    setForm({
+      name: s.name,
+      role: s.role,
+      email: s.email,
+      phone: s.phone ?? "",
+      bio: s.bio ?? "",
+      image: s.image ?? "",
+      show_in_frontend: s.show_in_frontend ?? true
+    });
+    setFile(null);
+    setShowForm(true);
   };
+
+  const handleSave = async () => {
+    if (!form.name || !form.role || !form.email) {
+      toast({ title: "Missing fields", description: "Name, role, and email are required.", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    try {
+      let imageUrl = form.image;
+      if (file) imageUrl = await uploadImage(file);
+
+      const payload = {
+        name: form.name,
+        role: form.role,
+        email: form.email,
+        phone: form.phone || null,
+        bio: form.bio || null,
+        image: imageUrl || null,
+        show_in_frontend: form.show_in_frontend,
+      };
+
+      if (editing) {
+        await updateStaff(editing.id, payload);
+        toast({ title: "Updated ✨", description: `${form.name} updated.` });
+      } else {
+        await addStaff(payload);
+        toast({ title: "Added ✨", description: `${form.name} added to staff.` });
+      }
+      setShowForm(false); setEditing(null); setForm(emptyForm); setFile(null);
+    } catch (e) {
+      toast({ title: "Error", description: e instanceof Error ? e.message : "Failed to save. Please try again.", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (s: Staff) => {
+    try {
+      await deleteStaff(s.id);
+      toast({ title: "Removed", description: `${s.name} removed from staff.` });
+    } catch {
+      toast({ title: "Error", description: "Failed to delete.", variant: "destructive" });
+    }
+  };
+
+  if (staffLoading) {
+    return (
+      <div className="flex items-center justify-center py-20 gap-3 text-muted-foreground">
+        <Loader2 className="animate-spin" size={20} />
+        <span className="font-body text-sm">Loading staff…</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl text-foreground">Staff Scheduling</h1>
-        <p className="text-muted-foreground font-body text-sm">Manage staff shifts and availability</p>
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="font-display text-2xl text-foreground">Staff Scheduling</h1>
+          <p className="text-muted-foreground font-body text-sm">Manage staff and availability — {staff.length} members</p>
+        </div>
+        <Button
+          onClick={() => { setShowForm(v => !v); setEditing(null); setForm(emptyForm); }}
+          className="bg-gold-gradient text-primary-foreground font-body font-bold text-xs uppercase tracking-wider"
+        >
+          <Plus size={16} className="mr-2" /> Add Staff
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {staff.map(s => (
-          <Card key={s.id}>
-            <CardContent className="p-4 space-y-3">
-              <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-full ${s.color} flex items-center justify-center text-white text-xs font-bold`}>
-                  {s.name.split(" ").map(n => n[0]).join("")}
+      {/* Add / Edit form */}
+      {showForm && (
+        <Card className="border-border">
+          <CardHeader><CardTitle className="font-display text-lg">{editing ? "Edit Staff Member" : "Add Staff Member"}</CardTitle></CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Input placeholder="Full Name *" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
+              <Input placeholder="Role / Title *" value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value }))} />
+              <Input placeholder="Email *" type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} />
+              <Input placeholder="Phone (optional)" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} />
+            </div>
+            <Textarea placeholder="Bio (optional)" value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))} rows={2} />
+            <div className="space-y-4 pt-2">
+              <label className="text-sm font-body text-foreground">Profile Image (optional)</label>
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div className="flex-1 space-y-2 w-full">
+                  <Input
+                    placeholder="Image URL (Or upload below)"
+                    value={form.image}
+                    onChange={e => { setForm(p => ({ ...p, image: e.target.value })); setFile(null); }}
+                  />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-body font-medium text-foreground text-sm truncate">{s.name}</p>
-                  <p className="text-xs text-muted-foreground">{s.role}</p>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-muted-foreground font-body hidden md:inline">OR</span>
+                  <label className="flex items-center gap-2 text-sm cursor-pointer whitespace-nowrap bg-secondary/50 hover:bg-secondary px-4 py-2 rounded-md transition-colors border border-border">
+                    <Upload size={14} />
+                    <span className="font-semibold font-body">{file ? "Change File" : "Upload File"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={e => {
+                        if (e.target.files?.[0]) {
+                          setFile(e.target.files[0]);
+                          setForm(p => ({ ...p, image: "" }));
+                        }
+                      }}
+                    />
+                  </label>
                 </div>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <Clock size={14} className="text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground font-body">{s.hoursWeek}h / week</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">{s.available ? "On" : "Off"}</span>
-                  <Switch checked={s.available} onCheckedChange={() => toggleAvailability(s.id)} />
-                </div>
+              <div className="mt-2 flex items-center gap-3">
+                <Switch
+                  checked={form.show_in_frontend}
+                  onCheckedChange={v => setForm(p => ({ ...p, show_in_frontend: v }))}
+                />
+                <span className="text-sm font-body text-muted-foreground">
+                  {form.show_in_frontend ? "Visible on Frontend" : "Hidden from Frontend"}
+                </span>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            </div>
+            <div className="flex gap-2 pt-2">
+              <Button onClick={handleSave} disabled={saving} className="bg-gold-gradient text-primary-foreground font-body text-xs uppercase">
+                {saving ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
+                {editing ? "Update" : "Add"}
+              </Button>
+              <Button variant="outline" onClick={() => { setShowForm(false); setEditing(null); setForm(emptyForm); setFile(null); }} className="font-body text-xs uppercase">Cancel</Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
+      {/* Staff cards */}
+      {staff.length === 0 ? (
+        <p className="text-muted-foreground font-body text-sm">No staff members yet. Add your first team member above.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {staff.map(s => (
+            <Card key={s.id}>
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full ${getColor(s.id)} flex items-center justify-center text-white text-sm font-bold`}>
+                    {s.image ? <img src={s.image} alt={s.name} className="w-10 h-10 rounded-full object-cover" /> : getInitials(s.name)}
+                  </div>
+                  <div className="flex-1 min-w-0 flex items-center justify-between">
+                    <div>
+                      <p className="font-body font-medium text-foreground text-sm truncate">{s.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{s.role}</p>
+                    </div>
+                    {s.show_in_frontend === false ? (
+                      <span title="Hidden from frontend"><EyeOff size={14} className="text-muted-foreground ml-2 flex-shrink-0" /></span>
+                    ) : (
+                      <span title="Visible on frontend"><Eye size={14} className="text-emerald-500 ml-2 flex-shrink-0" /></span>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground truncate">{s.email}</p>
+                {s.phone && <p className="text-xs text-muted-foreground">{s.phone}</p>}
+                {s.bio && <p className="text-xs text-muted-foreground italic line-clamp-2">{s.bio}</p>}
+                <div className="flex gap-1 pt-1">
+                  <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={() => openEdit(s)}>
+                    <Pencil size={12} className="mr-1" /> Edit
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => handleDelete(s)}>
+                    <Trash2 size={14} />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Weekly schedule grid (visual reference only) */}
       <Card>
-        <CardHeader><CardTitle className="font-display text-lg">Weekly Schedule</CardTitle></CardHeader>
+        <CardHeader>
+          <CardTitle className="font-display text-lg flex items-center gap-2">
+            <Clock size={18} className="text-primary" /> Weekly Schedule (Visual Reference)
+          </CardTitle>
+          <p className="text-xs text-muted-foreground font-body">Schedule visualisation — manage shifts by assigning bookings to staff</p>
+        </CardHeader>
         <CardContent className="overflow-x-auto">
           <div className="min-w-[700px]">
             <div className="grid grid-cols-8 gap-px bg-border rounded-lg overflow-hidden">
@@ -93,19 +238,9 @@ const AdminStaff = () => {
               {hours.map(h => (
                 <>
                   <div key={h} className="bg-card p-2 font-body text-xs text-muted-foreground">{h}</div>
-                  {days.map(d => {
-                    const key = `${d}-${h}`;
-                    const slots = scheduleData[key];
-                    return (
-                      <div key={key} className="bg-card p-1 min-h-[36px]">
-                        {slots?.map((s, i) => (
-                          <div key={i} className={`${s.color}/20 text-[10px] px-1.5 py-0.5 rounded mb-0.5 font-body truncate`}>
-                            {s.staff}
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  })}
+                  {days.map(d => (
+                    <div key={`${d}-${h}`} className="bg-card p-1 min-h-[36px]" />
+                  ))}
                 </>
               ))}
             </div>

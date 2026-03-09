@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Package, Scissors, CalendarDays, FileText, Star,
-  Mail, Users, DollarSign, BarChart3, Settings, LogOut, Menu, X, ChevronLeft, Share2, Search,
-  Heart, Boxes, UserCog, Percent, Contact, FileDown, CreditCard, Clock, MailOpen, Receipt
+  LayoutDashboard, Package, Scissors, CalendarDays, FileText, Star, Image,
+  Mail, Users, DollarSign, BarChart3, Settings, LogOut, Menu, ChevronLeft, Share2, Search,
+  Heart, Boxes, UserCog, Percent, Contact, FileDown, CreditCard, Clock, MailOpen, Receipt, Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const ADMIN_PASSWORD = "admin123";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { path: "/admin", icon: LayoutDashboard, label: "Dashboard", exact: true },
@@ -18,13 +17,14 @@ const navItems = [
   { path: "/admin/blog", icon: FileText, label: "Blog Posts" },
   { path: "/admin/testimonials", icon: Star, label: "Testimonials" },
   { path: "/admin/messages", icon: Mail, label: "Messages" },
+  { path: "/admin/gallery", icon: Image, label: "Gallery" },
   { path: "/admin/newsletter", icon: Users, label: "Newsletter" },
   { path: "/admin/social", icon: Share2, label: "Social Automation" },
   { path: "/admin/revenue", icon: DollarSign, label: "Revenue", hidden: true },
   { path: "/admin/analytics", icon: BarChart3, label: "Analytics" },
   { path: "/admin/seo", icon: Search, label: "SEO & Performance" },
   { path: "/admin/loyalty", icon: Heart, label: "Loyalty Program", hidden: true },
-  { path: "/admin/inventory", icon: Boxes, label: "Inventory" },
+  // { path: "/admin/inventory", icon: Boxes, label: "Inventory" },
   { path: "/admin/staff", icon: UserCog, label: "Staff Scheduling" },
   { path: "/admin/promotions", icon: Percent, label: "Promotions", hidden: true },
   { path: "/admin/customers", icon: Contact, label: "Customer CRM" },
@@ -32,43 +32,77 @@ const navItems = [
   { path: "/admin/gift-cards", icon: CreditCard, label: "Gift Cards", hidden: true },
   { path: "/admin/waitlist", icon: Clock, label: "Waitlist" },
   { path: "/admin/email-templates", icon: MailOpen, label: "Email Templates", hidden: true },
-  { path: "/admin/expenses", icon: Receipt, label: "Expenses" },
+  // { path: "/admin/expenses", icon: Receipt, label: "Expenses" },
   { path: "/admin/settings", icon: Settings, label: "Settings" },
 ];
 
-const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
+// ── Login Form ─────────────────────────────────────────────────────────────────
+const AdminLoginForm = () => {
+  const { login } = useAuth();
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem("admin_auth", "true");
-      onLogin();
-    } else {
-      setError("Incorrect password");
+    setError("");
+    setLoading(true);
+    try {
+      await login(username, password);
+    } catch (err) {
+      console.log("Login Error:", err);
+      setError("Incorrect username or password.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-charcoal flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-card border border-border rounded-xl p-8">
-        <h1 className="font-display text-2xl text-foreground text-center mb-1">Admin Panel</h1>
-        <p className="text-muted-foreground font-body text-sm text-center mb-6">Enter password to continue</p>
+        <div className="text-center mb-6">
+          <h1 className="font-display text-2xl text-foreground mb-1">Admin Panel</h1>
+          <p className="text-muted-foreground font-body text-sm">Sign in to continue</p>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => { setPassword(e.target.value); setError(""); }}
-            className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          {error && <p className="text-destructive text-sm font-body">{error}</p>}
-          <Button type="submit" className="w-full bg-gold-gradient text-primary-foreground font-body font-bold uppercase tracking-wider">
-            Login
+          <div>
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              autoComplete="username"
+              onChange={(e) => { setUsername(e.target.value); setError(""); }}
+              className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+          <div>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              autoComplete="current-password"
+              onChange={(e) => { setPassword(e.target.value); setError(""); }}
+              className="w-full px-4 py-2.5 rounded-lg bg-background border border-border text-foreground font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+          {error && (
+            <p className="text-destructive text-sm font-body bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
+              {error}
+            </p>
+          )}
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gold-gradient text-primary-foreground font-body font-bold uppercase tracking-wider"
+          >
+            {loading ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
+            {loading ? "Signing in…" : "Sign In"}
           </Button>
           <div className="text-center">
-            <Link to="/" className="text-gold hover:text-gold-light font-body text-sm transition-colors">← Back to Site</Link>
+            <Link to="/" className="text-gold hover:text-gold-light font-body text-sm transition-colors">
+              ← Back to Site
+            </Link>
           </div>
         </form>
       </div>
@@ -76,22 +110,30 @@ const AdminLogin = ({ onLogin }: { onLogin: () => void }) => {
   );
 };
 
+// ── Admin Layout ───────────────────────────────────────────────────────────────
 const AdminLayout = () => {
-  const [authed, setAuthed] = useState(() => sessionStorage.getItem("admin_auth") === "true");
+  const { user, isLoading, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  if (!authed) return <AdminLogin onLogin={() => setAuthed(true)} />;
+  // Show a full-screen spinner while validating the stored token
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-charcoal flex items-center justify-center">
+        <Loader2 size={32} className="animate-spin text-gold" />
+      </div>
+    );
+  }
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("admin_auth");
-    setAuthed(false);
-  };
+  // Not authenticated → show login form
+  if (!user) return <AdminLoginForm />;
 
   const isActive = (path: string, exact?: boolean) =>
-    exact ? location.pathname === path : location.pathname.startsWith(path) && (path !== "/admin" || location.pathname === "/admin");
+    exact
+      ? location.pathname === path
+      : location.pathname.startsWith(path) && (path !== "/admin" || location.pathname === "/admin");
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -116,6 +158,17 @@ const AdminLayout = () => {
             <ChevronLeft size={18} className={cn("transition-transform", !sidebarOpen && "rotate-180")} />
           </button>
         </div>
+
+        {/* User badge */}
+        {sidebarOpen && (
+          <div className="px-4 py-3 border-b border-border/30">
+            <p className="text-xs font-body text-cream/40 uppercase tracking-wider">Logged in as</p>
+            <p className="text-sm font-body font-semibold text-cream/90 truncate">{user.username}</p>
+            <span className="text-[10px] font-body text-gold bg-gold/10 px-1.5 py-0.5 rounded uppercase tracking-wider">
+              {user.role}
+            </span>
+          </div>
+        )}
 
         {/* Nav items */}
         <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
@@ -143,7 +196,7 @@ const AdminLayout = () => {
         {/* Footer */}
         <div className="p-2 border-t border-border/50">
           <button
-            onClick={handleLogout}
+            onClick={logout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-body text-sm text-cream/40 hover:text-destructive hover:bg-destructive/10 transition-all"
             title={!sidebarOpen ? "Logout" : undefined}
           >

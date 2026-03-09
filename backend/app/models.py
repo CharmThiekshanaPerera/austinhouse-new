@@ -93,3 +93,206 @@ class InventoryUpdate(BaseModel):
 
 class InventoryOut(InventoryBase):
     id: str
+
+
+class StaffBase(BaseModel):
+    name: str
+    role: str
+    email: str
+    phone: Optional[str] = None
+    bio: Optional[str] = None
+    image: Optional[str] = None
+    show_in_frontend: bool = True
+
+class StaffCreate(StaffBase):
+    pass
+
+class StaffUpdate(BaseModel):
+    name: Optional[str] = None
+    role: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    bio: Optional[str] = None
+    image: Optional[str] = None
+    show_in_frontend: Optional[bool] = None
+
+class StaffOut(StaffBase):
+    id: str
+
+
+class CustomerBase(BaseModel):
+    name: str
+    email: str
+    phone: Optional[str] = None
+    total_spent: float = Field(default=0.0, ge=0)
+    last_visit: Optional[str] = None
+
+class CustomerCreate(CustomerBase):
+    pass
+
+class CustomerUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    total_spent: Optional[float] = Field(default=None, ge=0)
+    last_visit: Optional[str] = None
+
+class CustomerOut(CustomerBase):
+    id: str
+
+
+BookingStatus = Literal["Pending", "Confirmed", "Cancelled", "Completed"]
+
+class BookingBase(BaseModel):
+    customer_name: str
+    customer_email: str
+    service_id: str
+    staff_id: Optional[str] = None
+    date: str
+    time: str
+    status: BookingStatus = "Pending"
+    notes: Optional[str] = None
+
+class BookingCreate(BookingBase):
+    pass
+
+class BookingUpdate(BaseModel):
+    customer_name: Optional[str] = None
+    customer_email: Optional[str] = None
+    service_id: Optional[str] = None
+    staff_id: Optional[str] = None
+    date: Optional[str] = None
+    time: Optional[str] = None
+    status: Optional[BookingStatus] = None
+    notes: Optional[str] = None
+
+class BookingOut(BookingBase):
+    id: str
+
+
+class WaitlistEntryBase(BaseModel):
+    name: str
+    email: str
+    phone: Optional[str] = None
+    preferred_date: str
+    service_id: str
+    notes: Optional[str] = None
+
+class WaitlistEntryCreate(WaitlistEntryBase):
+    pass
+
+class WaitlistEntryUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    preferred_date: Optional[str] = None
+    service_id: Optional[str] = None
+    notes: Optional[str] = None
+
+class WaitlistEntryOut(WaitlistEntryBase):
+    id: str
+
+
+class BlogPostBase(BaseModel):
+    title: str
+    slug: str
+    content: str
+    author_id: str
+    published: bool = False
+    image: Optional[str] = None
+
+class BlogPostCreate(BlogPostBase):
+    pass
+
+class BlogPostUpdate(BaseModel):
+    title: Optional[str] = None
+    slug: Optional[str] = None
+    content: Optional[str] = None
+    author_id: Optional[str] = None
+    published: Optional[bool] = None
+    image: Optional[str] = None
+
+class BlogPostOut(BlogPostBase):
+    id: str
+
+
+class TestimonialBase(BaseModel):
+    text: str
+    author: str
+    rating: float = Field(default=5.0, ge=0, le=5)
+
+class TestimonialCreate(TestimonialBase):
+    pass
+
+class TestimonialUpdate(BaseModel):
+    text: Optional[str] = None
+    author: Optional[str] = None
+    rating: Optional[float] = Field(default=None, ge=0, le=5)
+
+class TestimonialOut(TestimonialBase):
+    id: str
+
+
+class ContactMessageBase(BaseModel):
+    name: str
+    email: str
+    subject: str
+    message: str
+    read: bool = False
+    replied: bool = False
+
+
+class ContactMessageCreate(ContactMessageBase):
+    pass
+
+
+class ContactMessageUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    subject: Optional[str] = None
+    message: Optional[str] = None
+    read: Optional[bool] = None
+    replied: Optional[bool] = None
+
+
+class ContactMessageOut(ContactMessageBase):
+    id: str
+    createdAt: str
+
+
+GalleryCategory = Literal["Environment", "Treatments", "Results", "Products", "Before/After"]
+
+class GalleryImageBase(BaseModel):
+    image: str
+    alt: str
+    category: GalleryCategory
+
+class GalleryImageCreate(GalleryImageBase):
+    pass
+
+class GalleryImageUpdate(BaseModel):
+    image: Optional[str] = None
+    alt: Optional[str] = None
+    category: Optional[GalleryCategory] = None
+
+class GalleryImageOut(GalleryImageBase):
+    id: str
+
+
+class BeforeAfterBase(BaseModel):
+    before_image: str
+    after_image: str
+    title: str
+    description: str
+
+class BeforeAfterCreate(BeforeAfterBase):
+    pass
+
+class BeforeAfterUpdate(BaseModel):
+    before_image: Optional[str] = None
+    after_image: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+class BeforeAfterOut(BeforeAfterBase):
+    id: str
