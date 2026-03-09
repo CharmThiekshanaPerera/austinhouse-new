@@ -4,8 +4,6 @@
             "source": "/(.*)",
             "destination": "/index.html"
         }
-<<<<<<< HEAD
-=======
     ],
     "headers": [
         {
@@ -17,6 +15,5 @@
                 }
             ]
         }
->>>>>>> 99189ccadd469e4e66dc4ebf46916099c8e352f9
     ]
 }
