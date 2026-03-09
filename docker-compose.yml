@@ -11,7 +11,7 @@ services:
       - "8000:8000"
     environment:
       # Inject necessary environment variables automatically. Placeholders used.
-      - MONGODB_URI=mongodb+srv://admin:admin123@cluster0.abcde.mongodb.net/austinhouse?retryWrites=true&w=majority
+      - MONGODB_URI=mongodb+srv://dbuseraustin:9czck3sGNhWBM0gJ@austinhouse.sg4zrml.mongodb.net/?appName=austinhouse
       - JWT_SECRET=docker_local_secret_string
       - ALLOWED_ORIGINS=http://localhost
     volumes:
