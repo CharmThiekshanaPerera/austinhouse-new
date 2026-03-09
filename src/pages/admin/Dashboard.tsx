@@ -1,30 +1,49 @@
-import { Package, Scissors, CalendarDays, Mail, Star, Clock } from "lucide-react";
+import { Package, Scissors, CalendarDays, Mail, Star, Clock, Users, UserCog } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useData } from "@/contexts/DataContext";
-import { format } from "date-fns";
+import { format, isToday, parseISO } from "date-fns";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { cn } from "@/lib/utils";
+
+const statusConfig = {
+  Pending: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+  Confirmed: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+  Completed: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+  Cancelled: "bg-destructive/10 text-destructive border-destructive/20",
+};
 
 const Dashboard = () => {
-  const { products, services, bookings, contactMessages, testimonials, activityLogs } = useData();
+  const {
+    products, services, bookings, contactMessages, testimonials,
+    staff, customers, waitlistEntries,
+  } = useData();
 
   const unreadMessages = contactMessages.filter(m => !m.read).length;
-  const pendingBookings = bookings.filter(b => b.status === "pending").length;
+  const pendingBookings = bookings.filter(b => b.status === "Pending").length;
+  const todayBookings = bookings.filter(b => b.date && isToday(parseISO(b.date)));
 
   const kpis = [
-    { label: "Products", value: products.length, icon: Package, color: "text-blue-500" },
     { label: "Services", value: services.length, icon: Scissors, color: "text-emerald-500" },
+    { label: "Products", value: products.length, icon: Package, color: "text-blue-500" },
     { label: "Bookings", value: bookings.length, sub: `${pendingBookings} pending`, icon: CalendarDays, color: "text-amber-500" },
-    { label: "Messages", value: contactMessages.length, sub: `${unreadMessages} unread`, icon: Mail, color: "text-violet-500" },
+    { label: "Staff", value: staff.length, icon: UserCog, color: "text-violet-500" },
+    { label: "Customers", value: customers.length, icon: Users, color: "text-pink-500" },
+    { label: "Waitlist", value: waitlistEntries.length, icon: Clock, color: "text-orange-500" },
     { label: "Testimonials", value: testimonials.length, icon: Star, color: "text-yellow-500" },
+    { label: "Messages", value: contactMessages.length, sub: `${unreadMessages} unread`, icon: Mail, color: "text-indigo-500" },
   ];
 
-  // Booking status breakdown for pie chart
+  // Booking status breakdown for pie chart — use correct title-case keys
   const statusCounts = [
-    { name: "Pending", value: bookings.filter(b => b.status === "pending").length, color: "#f59e0b" },
-    { name: "Confirmed", value: bookings.filter(b => b.status === "confirmed").length, color: "#3b82f6" },
-    { name: "Completed", value: bookings.filter(b => b.status === "completed").length, color: "#10b981" },
-    { name: "Cancelled", value: bookings.filter(b => b.status === "cancelled").length, color: "#ef4444" },
+    { name: "Pending", value: bookings.filter(b => b.status === "Pending").length, color: "#f59e0b" },
+    { name: "Confirmed", value: bookings.filter(b => b.status === "Confirmed").length, color: "#3b82f6" },
+    { name: "Completed", value: bookings.filter(b => b.status === "Completed").length, color: "#10b981" },
+    { name: "Cancelled", value: bookings.filter(b => b.status === "Cancelled").length, color: "#ef4444" },
   ].filter(s => s.value > 0);
+
+  // Resolve service name from id
+  const serviceMap = Object.fromEntries(services.map(s => [s.id, s.title]));
 
   return (
     <div className="space-y-8">
@@ -34,7 +53,7 @@ const Dashboard = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {kpis.map(kpi => (
           <Card key={kpi.label} className="border-border">
             <CardContent className="p-4">
@@ -52,7 +71,7 @@ const Dashboard = () => {
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Booking Status Pie */}
         <Card className="border-border">
-          <CardHeader><CardTitle className="font-display text-base">Booking Status</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="font-display text-base">Booking Status Breakdown</CardTitle></CardHeader>
           <CardContent>
             {statusCounts.length > 0 ? (
               <div className="flex items-center gap-6">
@@ -78,30 +97,81 @@ const Dashboard = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Today's Bookings */}
+        <Card className="border-border">
+          <CardHeader>
+            <CardTitle className="font-display text-base">
+              Today's Bookings
+              <span className="ml-2 text-sm font-body text-muted-foreground font-normal">
+                {format(new Date(), "EEEE, MMM d")}
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {todayBookings.length === 0 ? (
+              <p className="text-muted-foreground font-body text-sm py-8 text-center">No bookings scheduled for today.</p>
+            ) : (
+              <div className="space-y-3 max-h-[220px] overflow-y-auto">
+                {[...todayBookings].sort((a, b) => (a.time ?? "").localeCompare(b.time ?? "")).map(b => (
+                  <div key={b.id} className="flex items-center gap-3">
+                    <div className="w-12 text-xs font-body text-muted-foreground text-right flex-shrink-0">{b.time}</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-body text-sm font-medium text-foreground truncate">{b.customer_name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{serviceMap[b.service_id] ?? b.service_id}</p>
+                    </div>
+                    <Badge variant="outline" className={cn("text-[10px] font-body flex-shrink-0", statusConfig[b.status])}>
+                      {b.status}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Recent Activity */}
+      {/* Upcoming Bookings (next 7 days) */}
       <Card className="border-border">
-        <CardHeader><CardTitle className="font-display text-base">Recent Activity</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="font-display text-base">Upcoming Bookings (Next 7 Days)</CardTitle></CardHeader>
         <CardContent>
-          {activityLogs.length === 0 ? (
-            <p className="text-muted-foreground font-body text-sm">No activity yet.</p>
-          ) : (
-            <div className="space-y-3 max-h-[400px] overflow-y-auto">
-              {activityLogs.slice(0, 15).map(log => (
-                <div key={log.id} className="flex items-start gap-3 text-sm font-body">
-                  <Clock size={14} className="text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <span className="font-semibold text-foreground">{log.action}</span>
-                    <span className="text-muted-foreground ml-1">— {log.detail}</span>
+          {bookings.length === 0 ? (
+            <p className="text-muted-foreground font-body text-sm">No bookings yet.</p>
+          ) : (() => {
+            const now = new Date();
+            const upcoming = [...bookings]
+              .filter(b => {
+                if (!b.date) return false;
+                const d = parseISO(b.date);
+                const diff = (d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+                return diff >= 0 && diff <= 7 && b.status !== "Cancelled";
+              })
+              .sort((a, b) => (a.date ?? "").localeCompare(b.date ?? "") || (a.time ?? "").localeCompare(b.time ?? ""));
+
+            if (upcoming.length === 0) return (
+              <p className="text-muted-foreground font-body text-sm">No upcoming bookings in the next 7 days.</p>
+            );
+
+            return (
+              <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                {upcoming.map(b => (
+                  <div key={b.id} className="flex items-center gap-3">
+                    <div className="w-20 text-xs font-body text-muted-foreground flex-shrink-0">
+                      {b.date ? format(parseISO(b.date), "EEE, MMM d") : "—"}
+                    </div>
+                    <div className="w-14 text-xs font-body text-muted-foreground flex-shrink-0">{b.time}</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-body text-sm font-medium text-foreground truncate">{b.customer_name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{serviceMap[b.service_id] ?? b.service_id}</p>
+                    </div>
+                    <Badge variant="outline" className={cn("text-[10px] font-body flex-shrink-0", statusConfig[b.status])}>
+                      {b.status}
+                    </Badge>
                   </div>
-                  <span className="text-xs text-muted-foreground flex-shrink-0">
-                    {format(new Date(log.timestamp), "MMM d, HH:mm")}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            );
+          })()}
         </CardContent>
       </Card>
     </div>

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { CartProvider } from "@/contexts/CartContext";
 import { DataProvider } from "@/contexts/DataContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import PageTransition from "@/components/PageTransition";
 import ChatBot from "@/components/ChatBot";
@@ -30,6 +31,7 @@ const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
 const AdminBlog = lazy(() => import("./pages/admin/AdminBlog"));
 const AdminTestimonials = lazy(() => import("./pages/admin/AdminTestimonials"));
 const AdminMessages = lazy(() => import("./pages/admin/AdminMessages"));
+const AdminGallery = lazy(() => import("./pages/admin/AdminGallery"));
 const AdminNewsletter = lazy(() => import("./pages/admin/AdminNewsletter"));
 const AdminRevenue = lazy(() => import("./pages/admin/AdminRevenue"));
 const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
@@ -80,6 +82,7 @@ const AnimatedRoutes = () => {
           <Route path="blog" element={<AdminBlog />} />
           <Route path="testimonials" element={<AdminTestimonials />} />
           <Route path="messages" element={<AdminMessages />} />
+          <Route path="gallery" element={<AdminGallery />} />
           <Route path="newsletter" element={<AdminNewsletter />} />
           <Route path="social" element={<AdminSocial />} />
           <Route path="revenue" element={<AdminRevenue />} />
@@ -106,17 +109,19 @@ const AnimatedRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <DataProvider>
-        <CartProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <ScrollToTop />
-            <AnimatedRoutes />
-            <ChatBot />
-          </BrowserRouter>
-        </CartProvider>
-      </DataProvider>
+      <AuthProvider>
+        <DataProvider>
+          <CartProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <ScrollToTop />
+              <AnimatedRoutes />
+              <ChatBot />
+            </BrowserRouter>
+          </CartProvider>
+        </DataProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

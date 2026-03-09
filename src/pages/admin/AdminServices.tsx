@@ -198,21 +198,42 @@ const ServiceForm = ({
         </div>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3">
-          <label className="text-sm font-body text-foreground">Image</label>
-          <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
-            <Upload size={14} />
-            <span>{file ? "Change image" : "Upload image"}</span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={e => setFile(e.target.files?.[0] ?? null)}
+      <div className="space-y-4">
+        <label className="text-sm font-body text-foreground">Image <span className="text-destructive">*</span></label>
+
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+          <div className="flex-1 space-y-2 w-full">
+            <Input
+              placeholder="https://... (Or upload below)"
+              value={form.image}
+              onChange={e => {
+                set("image", e.target.value);
+                setFile(null); // Clear file if user types a URL
+              }}
+              className="bg-background"
             />
-          </label>
+            <p className="text-xs text-muted-foreground font-body">Or upload a file from your computer below. Note: uploading a file overrides the URL above.</p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground font-body hidden md:inline">OR</span>
+            <label className="flex items-center gap-2 text-sm cursor-pointer whitespace-nowrap bg-secondary/50 hover:bg-secondary px-4 py-2 rounded-md transition-colors border border-border">
+              <Upload size={14} />
+              <span className="font-semibold font-body">{file ? "Change File" : "Upload File"}</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={e => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    setFile(e.target.files[0]);
+                    set("image", ""); // Clear text URL since we have a file
+                  }
+                }}
+              />
+            </label>
+          </div>
         </div>
-        <p className="text-xs text-muted-foreground font-body">Uploads to the backend and saves the image URL on the service.</p>
 
         {previewUrl ? (
           <img src={previewUrl} alt="Preview" className="w-28 h-28 rounded-md object-cover border border-border" />
