@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Package, Scissors, CalendarDays, FileText, Star,
+  LayoutDashboard, Package, Scissors, CalendarDays, FileText, Star, Image,
   Mail, Users, DollarSign, BarChart3, Settings, LogOut, Menu, ChevronLeft, Share2, Search,
   Heart, Boxes, UserCog, Percent, Contact, FileDown, CreditCard, Clock, MailOpen, Receipt, Loader2,
 } from "lucide-react";
@@ -17,13 +17,14 @@ const navItems = [
   { path: "/admin/blog", icon: FileText, label: "Blog Posts" },
   { path: "/admin/testimonials", icon: Star, label: "Testimonials" },
   { path: "/admin/messages", icon: Mail, label: "Messages" },
+  { path: "/admin/gallery", icon: Image, label: "Gallery" },
   { path: "/admin/newsletter", icon: Users, label: "Newsletter" },
   { path: "/admin/social", icon: Share2, label: "Social Automation" },
   { path: "/admin/revenue", icon: DollarSign, label: "Revenue", hidden: true },
   { path: "/admin/analytics", icon: BarChart3, label: "Analytics" },
   { path: "/admin/seo", icon: Search, label: "SEO & Performance" },
   { path: "/admin/loyalty", icon: Heart, label: "Loyalty Program", hidden: true },
-  { path: "/admin/inventory", icon: Boxes, label: "Inventory" },
+  // { path: "/admin/inventory", icon: Boxes, label: "Inventory" },
   { path: "/admin/staff", icon: UserCog, label: "Staff Scheduling" },
   { path: "/admin/promotions", icon: Percent, label: "Promotions", hidden: true },
   { path: "/admin/customers", icon: Contact, label: "Customer CRM" },
@@ -31,7 +32,7 @@ const navItems = [
   { path: "/admin/gift-cards", icon: CreditCard, label: "Gift Cards", hidden: true },
   { path: "/admin/waitlist", icon: Clock, label: "Waitlist" },
   { path: "/admin/email-templates", icon: MailOpen, label: "Email Templates", hidden: true },
-  { path: "/admin/expenses", icon: Receipt, label: "Expenses" },
+  // { path: "/admin/expenses", icon: Receipt, label: "Expenses" },
   { path: "/admin/settings", icon: Settings, label: "Settings" },
 ];
 
@@ -49,7 +50,8 @@ const AdminLoginForm = () => {
     setLoading(true);
     try {
       await login(username, password);
-    } catch {
+    } catch (err) {
+      console.log("Login Error:", err);
       setError("Incorrect username or password.");
     } finally {
       setLoading(false);

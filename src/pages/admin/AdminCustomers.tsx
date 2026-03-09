@@ -83,7 +83,7 @@ const AdminCustomers = () => {
                 <TableRow>
                   <TableHead className="font-body">Customer</TableHead>
                   <TableHead className="font-body">Phone</TableHead>
-                  <TableHead className="font-body">Total Spent</TableHead>
+                  {/* <TableHead className="font-body">Total Spent</TableHead> */}
                   <TableHead className="font-body">Last Visit</TableHead>
                   <TableHead className="font-body">Actions</TableHead>
                 </TableRow>
@@ -98,7 +98,7 @@ const AdminCustomers = () => {
                       </div>
                     </TableCell>
                     <TableCell className="font-body text-muted-foreground text-sm">{c.phone ?? "—"}</TableCell>
-                    <TableCell className="font-body font-semibold text-foreground">${(c.total_spent ?? 0).toLocaleString()}</TableCell>
+                    {/* <TableCell className="font-body font-semibold text-foreground">${(c.total_spent ?? 0).toLocaleString()}</TableCell> */}
                     <TableCell className="font-body text-muted-foreground text-sm">{c.last_visit ?? "—"}</TableCell>
                     <TableCell>
                       <Button size="sm" variant="destructive" onClick={() => handleDelete(c.id, c.name)}>

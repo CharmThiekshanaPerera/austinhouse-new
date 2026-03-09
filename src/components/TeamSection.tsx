@@ -17,6 +17,7 @@ const MemberSkeleton = () => (
 
 const TeamSection = () => {
   const { staff, staffLoading } = useData();
+  const visibleStaff = staff.filter(s => s.show_in_frontend !== false);
 
   return (
     <section className="py-20 lg:py-32 bg-secondary/50">
@@ -37,13 +38,13 @@ const TeamSection = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[...Array(4)].map((_, i) => <MemberSkeleton key={i} />)}
           </div>
-        ) : staff.length === 0 ? (
+        ) : visibleStaff.length === 0 ? (
           <div className="text-center text-muted-foreground font-body">
             No team members added yet. Check back soon!
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {staff.map((member, index) => (
+            {visibleStaff.map((member, index) => (
               <motion.div
                 key={member.id}
                 initial={{ opacity: 0, y: 30 }}

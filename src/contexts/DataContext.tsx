@@ -7,6 +7,10 @@ import { customersApi } from "@/lib/customersApi";
 import { blogApi } from "@/lib/blogApi";
 import { waitlistApi } from "@/lib/waitlistApi";
 import { testimonialsApi } from "@/lib/testimonialsApi";
+import { contactMessagesApi } from "@/lib/contactMessagesApi";
+import { galleryImagesApi, beforeAfterApi, GalleryImage, BeforeAfterPair } from "@/lib/galleryApi";
+
+export type { GalleryImage, BeforeAfterPair } from "@/lib/galleryApi";
 
 export interface Product {
   id: string;
@@ -52,6 +56,7 @@ export interface Staff {
   phone?: string | null;
   bio?: string | null;
   image?: string | null;
+  show_in_frontend?: boolean;
 }
 
 // Matches backend CustomerBase schema
@@ -145,6 +150,8 @@ interface DataContextType {
   newsletterSubscribers: NewsletterSubscriber[];
   revenueEntries: RevenueEntry[];
   activityLogs: ActivityLog[];
+  galleryImages: GalleryImage[];
+  beforeAfterPairs: BeforeAfterPair[];
   // Loading states
   servicesLoading: boolean;
   productsLoading: boolean;
@@ -154,6 +161,8 @@ interface DataContextType {
   blogLoading: boolean;
   waitlistLoading: boolean;
   testimonialsLoading: boolean;
+  contactMessagesLoading: boolean;
+  galleryLoading: boolean;
   // Products
   addProduct: (p: Omit<Product, "id">) => Promise<Product>;
   updateProduct: (p: Product) => Promise<Product>;
@@ -185,10 +194,18 @@ interface DataContextType {
   addTestimonial: (t: Omit<Testimonial, "id">) => Promise<Testimonial>;
   updateTestimonial: (id: string, t: Partial<Omit<Testimonial, "id">>) => Promise<Testimonial>;
   deleteTestimonial: (id: string) => Promise<void>;
+  // Contact Messages (API-backed)
+  addContactMessage: (m: Omit<ContactMessage, "id" | "createdAt" | "read" | "replied">) => Promise<ContactMessage>;
+  updateContactMessage: (id: string, m: Partial<Omit<ContactMessage, "id" | "createdAt">>) => Promise<ContactMessage>;
+  deleteContactMessage: (id: string) => Promise<void>;
+  // Gallery (API-backed)
+  addGalleryImage: (img: Omit<GalleryImage, "id">) => Promise<GalleryImage>;
+  deleteGalleryImage: (id: string) => Promise<void>;
+  updateGalleryImage: (id: string, img: Partial<Omit<GalleryImage, "id">>) => Promise<GalleryImage>;
+  addBeforeAfterPair: (pair: Omit<BeforeAfterPair, "id">) => Promise<BeforeAfterPair>;
+  deleteBeforeAfterPair: (id: string) => Promise<void>;
+  updateBeforeAfterPair: (id: string, pair: Partial<Omit<BeforeAfterPair, "id">>) => Promise<BeforeAfterPair>;
   // Local-only
-  addContactMessage: (m: Omit<ContactMessage, "id" | "createdAt" | "read" | "replied">) => void;
-  updateContactMessage: (m: ContactMessage) => void;
-  deleteContactMessage: (id: string) => void;
   addNewsletterSubscriber: (email: string) => void;
   updateNewsletterSubscriber: (s: NewsletterSubscriber) => void;
   deleteNewsletterSubscriber: (id: string) => void;
@@ -219,6 +236,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [newsletterSubscribers, setNewsletterSubscribers] = useState<NewsletterSubscriber[]>([]);
   const [revenueEntries, setRevenueEntries] = useState<RevenueEntry[]>([]);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [beforeAfterPairs, setBeforeAfterPairs] = useState<BeforeAfterPair[]>([]);
 
   // Loading states
   const [servicesLoading, setServicesLoading] = useState(true);
@@ -229,6 +248,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [blogLoading, setBlogLoading] = useState(true);
   const [waitlistLoading, setWaitlistLoading] = useState(true);
   const [testimonialsLoading, setTestimonialsLoading] = useState(true);
+  const [contactMessagesLoading, setContactMessagesLoading] = useState(true);
+  const [galleryLoading, setGalleryLoading] = useState(true);
 
   const addActivityLog = (action: string, detail: string) =>
     setActivityLogs(prev =>
@@ -358,6 +379,44 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         console.warn("Failed to load testimonials from API.", e);
       } finally {
         if (!cancelled) setTestimonialsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // ─── Contact Messages ────────────────────────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const remote = await contactMessagesApi.list();
+        if (!cancelled) setContactMessages(remote);
+      } catch (e) {
+        console.warn("Failed to load contact messages from API.", e);
+      } finally {
+        if (!cancelled) setContactMessagesLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // ─── Gallery Images & Before/After ───────────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [imgs, pairs] = await Promise.all([
+          galleryImagesApi.list(),
+          beforeAfterApi.list(),
+        ]);
+        if (!cancelled) {
+          setGalleryImages(imgs);
+          setBeforeAfterPairs(pairs);
+        }
+      } catch (e) {
+        console.warn("Failed to load gallery from API.", e);
+      } finally {
+        if (!cancelled) setGalleryLoading(false);
       }
     })();
     return () => { cancelled = true; };
@@ -525,21 +584,66 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // ─── Local-only CRUD ────────────────────────────────────────────────────────
-  const addContactMessage = (m: Omit<ContactMessage, "id" | "createdAt" | "read" | "replied">) => {
-    setContactMessages(prev => [
-      ...prev,
-      { ...m, id: `m_${Date.now()}`, createdAt: new Date().toISOString(), read: false, replied: false },
-    ]);
+  // ─── Contact Message CRUD ──────────────────────────────────────────────────
+  const addContactMessage = async (m: Omit<ContactMessage, "id" | "createdAt" | "read" | "replied">) => {
+    const created = await contactMessagesApi.create(m);
+    setContactMessages(prev => [...prev, created]);
     addActivityLog("New Contact Message", m.subject);
+    return created;
   };
 
-  const updateContactMessage = (m: ContactMessage) =>
-    setContactMessages(prev => prev.map(x => (x.id === m.id ? m : x)));
+  const updateContactMessage = async (id: string, m: Partial<Omit<ContactMessage, "id" | "createdAt">>) => {
+    const updated = await contactMessagesApi.update(id, m);
+    setContactMessages(prev => prev.map(x => (x.id === id ? updated : x)));
+    return updated;
+  };
 
-  const deleteContactMessage = (id: string) => {
+  const deleteContactMessage = async (id: string) => {
+    await contactMessagesApi.remove(id);
     setContactMessages(prev => prev.filter(x => x.id !== id));
     addActivityLog("Message Deleted", id);
   };
+
+  // ─── Gallery CRUD ────────────────────────────────────────────────────────
+  const addGalleryImage = async (img: Omit<GalleryImage, "id">) => {
+    const created = await galleryImagesApi.create(img);
+    setGalleryImages(prev => [...prev, created]);
+    addActivityLog("Gallery Image Added", created.alt);
+    return created;
+  };
+
+  const updateGalleryImage = async (id: string, img: Partial<Omit<GalleryImage, "id">>) => {
+    const updated = await galleryImagesApi.update(id, img);
+    setGalleryImages(prev => prev.map(x => (x.id === id ? updated : x)));
+    return updated;
+  };
+
+  const deleteGalleryImage = async (id: string) => {
+    await galleryImagesApi.remove(id);
+    setGalleryImages(prev => prev.filter(x => x.id !== id));
+    addActivityLog("Gallery Image Deleted", id);
+  };
+
+  const addBeforeAfterPair = async (pair: Omit<BeforeAfterPair, "id">) => {
+    const created = await beforeAfterApi.create(pair);
+    setBeforeAfterPairs(prev => [...prev, created]);
+    addActivityLog("Before/After Pair Added", created.title);
+    return created;
+  };
+
+  const updateBeforeAfterPair = async (id: string, pair: Partial<Omit<BeforeAfterPair, "id">>) => {
+    const updated = await beforeAfterApi.update(id, pair);
+    setBeforeAfterPairs(prev => prev.map(x => (x.id === id ? updated : x)));
+    return updated;
+  };
+
+  const deleteBeforeAfterPair = async (id: string) => {
+    await beforeAfterApi.remove(id);
+    setBeforeAfterPairs(prev => prev.filter(x => x.id !== id));
+    addActivityLog("Before/After Pair Deleted", id);
+  };
+
+  // ─── Local-only CRUD ────────────────────────────────────────────────────────
 
   const addNewsletterSubscriber = (email: string) => {
     setNewsletterSubscribers(prev => [
@@ -587,6 +691,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         newsletterSubscribers,
         revenueEntries,
         activityLogs,
+        galleryImages,
+        beforeAfterPairs,
         servicesLoading,
         productsLoading,
         bookingsLoading,
@@ -595,6 +701,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         blogLoading,
         waitlistLoading,
         testimonialsLoading,
+        contactMessagesLoading,
+        galleryLoading,
         addProduct,
         updateProduct,
         deleteProduct,
@@ -627,6 +735,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         addRevenueEntry,
         updateRevenueEntry,
         deleteRevenueEntry,
+        addGalleryImage,
+        updateGalleryImage,
+        deleteGalleryImage,
+        addBeforeAfterPair,
+        updateBeforeAfterPair,
+        deleteBeforeAfterPair,
         addActivityLog,
       }}
     >

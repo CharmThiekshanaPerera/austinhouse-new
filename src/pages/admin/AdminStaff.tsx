@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useData, Staff } from "@/contexts/DataContext";
-import { UserCog, Clock, Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { UserCog, Clock, Plus, Pencil, Trash2, Loader2, Upload, Eye, EyeOff } from "lucide-react";
+import { uploadImage } from "@/lib/uploadsApi";
 
 const STAFF_COLORS = [
   "bg-purple-500", "bg-blue-500", "bg-green-500", "bg-pink-500",
@@ -16,7 +17,7 @@ const STAFF_COLORS = [
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const hours = ["9AM", "10AM", "11AM", "12PM", "1PM", "2PM", "3PM", "4PM", "5PM", "6PM"];
 
-const emptyForm = { name: "", role: "", email: "", phone: "", bio: "" };
+const emptyForm = { name: "", role: "", email: "", phone: "", bio: "", image: "", show_in_frontend: true };
 
 const AdminStaff = () => {
   const { staff, addStaff, updateStaff, deleteStaff, staffLoading } = useData();
@@ -24,6 +25,7 @@ const AdminStaff = () => {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Staff | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
 
   const getInitials = (name: string) =>
@@ -34,7 +36,16 @@ const AdminStaff = () => {
 
   const openEdit = (s: Staff) => {
     setEditing(s);
-    setForm({ name: s.name, role: s.role, email: s.email, phone: s.phone ?? "", bio: s.bio ?? "" });
+    setForm({
+      name: s.name,
+      role: s.role,
+      email: s.email,
+      phone: s.phone ?? "",
+      bio: s.bio ?? "",
+      image: s.image ?? "",
+      show_in_frontend: s.show_in_frontend ?? true
+    });
+    setFile(null);
     setShowForm(true);
   };
 
@@ -45,16 +56,29 @@ const AdminStaff = () => {
     }
     setSaving(true);
     try {
+      let imageUrl = form.image;
+      if (file) imageUrl = await uploadImage(file);
+
+      const payload = {
+        name: form.name,
+        role: form.role,
+        email: form.email,
+        phone: form.phone || null,
+        bio: form.bio || null,
+        image: imageUrl || null,
+        show_in_frontend: form.show_in_frontend,
+      };
+
       if (editing) {
-        await updateStaff(editing.id, { ...form, phone: form.phone || null, bio: form.bio || null });
+        await updateStaff(editing.id, payload);
         toast({ title: "Updated ✨", description: `${form.name} updated.` });
       } else {
-        await addStaff({ ...form, phone: form.phone || null, bio: form.bio || null, image: null });
+        await addStaff(payload);
         toast({ title: "Added ✨", description: `${form.name} added to staff.` });
       }
-      setShowForm(false); setEditing(null); setForm(emptyForm);
-    } catch {
-      toast({ title: "Error", description: "Failed to save. Please try again.", variant: "destructive" });
+      setShowForm(false); setEditing(null); setForm(emptyForm); setFile(null);
+    } catch (e) {
+      toast({ title: "Error", description: e instanceof Error ? e.message : "Failed to save. Please try again.", variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -105,12 +129,51 @@ const AdminStaff = () => {
               <Input placeholder="Phone (optional)" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} />
             </div>
             <Textarea placeholder="Bio (optional)" value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))} rows={2} />
-            <div className="flex gap-2">
+            <div className="space-y-4 pt-2">
+              <label className="text-sm font-body text-foreground">Profile Image (optional)</label>
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div className="flex-1 space-y-2 w-full">
+                  <Input
+                    placeholder="Image URL (Or upload below)"
+                    value={form.image}
+                    onChange={e => { setForm(p => ({ ...p, image: e.target.value })); setFile(null); }}
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-muted-foreground font-body hidden md:inline">OR</span>
+                  <label className="flex items-center gap-2 text-sm cursor-pointer whitespace-nowrap bg-secondary/50 hover:bg-secondary px-4 py-2 rounded-md transition-colors border border-border">
+                    <Upload size={14} />
+                    <span className="font-semibold font-body">{file ? "Change File" : "Upload File"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={e => {
+                        if (e.target.files?.[0]) {
+                          setFile(e.target.files[0]);
+                          setForm(p => ({ ...p, image: "" }));
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+              <div className="mt-2 flex items-center gap-3">
+                <Switch
+                  checked={form.show_in_frontend}
+                  onCheckedChange={v => setForm(p => ({ ...p, show_in_frontend: v }))}
+                />
+                <span className="text-sm font-body text-muted-foreground">
+                  {form.show_in_frontend ? "Visible on Frontend" : "Hidden from Frontend"}
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-2 pt-2">
               <Button onClick={handleSave} disabled={saving} className="bg-gold-gradient text-primary-foreground font-body text-xs uppercase">
                 {saving ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
                 {editing ? "Update" : "Add"}
               </Button>
-              <Button variant="outline" onClick={() => { setShowForm(false); setEditing(null); setForm(emptyForm); }} className="font-body text-xs uppercase">Cancel</Button>
+              <Button variant="outline" onClick={() => { setShowForm(false); setEditing(null); setForm(emptyForm); setFile(null); }} className="font-body text-xs uppercase">Cancel</Button>
             </div>
           </CardContent>
         </Card>
@@ -128,9 +191,16 @@ const AdminStaff = () => {
                   <div className={`w-10 h-10 rounded-full ${getColor(s.id)} flex items-center justify-center text-white text-sm font-bold`}>
                     {s.image ? <img src={s.image} alt={s.name} className="w-10 h-10 rounded-full object-cover" /> : getInitials(s.name)}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-body font-medium text-foreground text-sm truncate">{s.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">{s.role}</p>
+                  <div className="flex-1 min-w-0 flex items-center justify-between">
+                    <div>
+                      <p className="font-body font-medium text-foreground text-sm truncate">{s.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{s.role}</p>
+                    </div>
+                    {s.show_in_frontend === false ? (
+                      <span title="Hidden from frontend"><EyeOff size={14} className="text-muted-foreground ml-2 flex-shrink-0" /></span>
+                    ) : (
+                      <span title="Visible on frontend"><Eye size={14} className="text-emerald-500 ml-2 flex-shrink-0" /></span>
+                    )}
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground truncate">{s.email}</p>

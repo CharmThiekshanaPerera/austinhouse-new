@@ -102,6 +102,7 @@ class StaffBase(BaseModel):
     phone: Optional[str] = None
     bio: Optional[str] = None
     image: Optional[str] = None
+    show_in_frontend: bool = True
 
 class StaffCreate(StaffBase):
     pass
@@ -113,6 +114,7 @@ class StaffUpdate(BaseModel):
     phone: Optional[str] = None
     bio: Optional[str] = None
     image: Optional[str] = None
+    show_in_frontend: Optional[bool] = None
 
 class StaffOut(StaffBase):
     id: str
@@ -228,4 +230,69 @@ class TestimonialUpdate(BaseModel):
     rating: Optional[float] = Field(default=None, ge=0, le=5)
 
 class TestimonialOut(TestimonialBase):
+    id: str
+
+
+class ContactMessageBase(BaseModel):
+    name: str
+    email: str
+    subject: str
+    message: str
+    read: bool = False
+    replied: bool = False
+
+
+class ContactMessageCreate(ContactMessageBase):
+    pass
+
+
+class ContactMessageUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    subject: Optional[str] = None
+    message: Optional[str] = None
+    read: Optional[bool] = None
+    replied: Optional[bool] = None
+
+
+class ContactMessageOut(ContactMessageBase):
+    id: str
+    createdAt: str
+
+
+GalleryCategory = Literal["Environment", "Treatments", "Results", "Products", "Before/After"]
+
+class GalleryImageBase(BaseModel):
+    image: str
+    alt: str
+    category: GalleryCategory
+
+class GalleryImageCreate(GalleryImageBase):
+    pass
+
+class GalleryImageUpdate(BaseModel):
+    image: Optional[str] = None
+    alt: Optional[str] = None
+    category: Optional[GalleryCategory] = None
+
+class GalleryImageOut(GalleryImageBase):
+    id: str
+
+
+class BeforeAfterBase(BaseModel):
+    before_image: str
+    after_image: str
+    title: str
+    description: str
+
+class BeforeAfterCreate(BeforeAfterBase):
+    pass
+
+class BeforeAfterUpdate(BaseModel):
+    before_image: Optional[str] = None
+    after_image: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+class BeforeAfterOut(BeforeAfterBase):
     id: str

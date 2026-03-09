@@ -16,7 +16,7 @@ const emptyPost = {
   slug: "",
   content: "",
   author_id: ADMIN_AUTHOR_ID,
-  published: false,
+  published: true, // Default to published to prevent confusion
   image: "" as string | null,
 };
 
@@ -145,12 +145,15 @@ const AdminBlog = () => {
               <Switch checked={form.published} onCheckedChange={v => set("published", v)} />
               <span className="text-sm font-body text-muted-foreground">{form.published ? "Published" : "Draft"}</span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Button onClick={handleSave} disabled={saving} className="bg-gold-gradient text-primary-foreground font-body font-bold text-xs uppercase tracking-wider">
                 {saving ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
                 {editing ? "Update" : "Create"} Post
               </Button>
-              <Button variant="outline" onClick={() => { setShowForm(false); setEditing(null); setForm(emptyPost); }} className="font-body text-xs uppercase tracking-wider">Cancel</Button>
+              <Button variant="outline" onClick={() => setPreview({ ...form, id: "preview", created_at: new Date().toISOString() } as unknown as BlogPost)} className="font-body text-xs uppercase tracking-wider text-gold border-gold/50 hover:bg-gold/10">
+                <Eye size={14} className="mr-2" /> Preview
+              </Button>
+              <Button variant="outline" onClick={() => { setShowForm(false); setEditing(null); setForm(emptyPost); setPreview(null); }} className="font-body text-xs uppercase tracking-wider">Cancel</Button>
             </div>
           </CardContent>
         </Card>

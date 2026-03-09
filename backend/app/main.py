@@ -17,6 +17,8 @@ from app.routes.customers import router as customers_router
 from app.routes.waitlist import router as waitlist_router
 from app.routes.blog import router as blog_router
 from app.routes.testimonials import router as testimonials_router
+from app.routes.messages import router as messages_router
+from app.routes.gallery import router as gallery_router
 from app.routes.auth import router as auth_router
 from app.settings import settings
 from pathlib import Path
@@ -53,6 +55,8 @@ app.include_router(staff_router, prefix="/api")
 app.include_router(customers_router, prefix="/api")
 app.include_router(waitlist_router, prefix="/api")
 app.include_router(blog_router, prefix="/api")
+app.include_router(messages_router, prefix="/api")
+app.include_router(gallery_router, prefix="/api")
 
 uploads_dir = Path(__file__).resolve().parents[1] / "uploads"
 uploads_dir.mkdir(parents=True, exist_ok=True)

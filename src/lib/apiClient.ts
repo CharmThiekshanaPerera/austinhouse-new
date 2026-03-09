@@ -24,7 +24,9 @@ export async function apiRequest<TResponse>(
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`API ${res.status} ${res.statusText}${text ? `: ${text}` : ""}`);
+    const errorMsg = `API ${res.status} ${res.statusText}${text ? `: ${text}` : ""}`;
+    console.error("[API Error]", errorMsg, "Path:", path);
+    throw new Error(errorMsg);
   }
 
   if (res.status === 204) return undefined as TResponse;

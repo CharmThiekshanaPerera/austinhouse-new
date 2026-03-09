@@ -31,6 +31,7 @@ const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
 const AdminBlog = lazy(() => import("./pages/admin/AdminBlog"));
 const AdminTestimonials = lazy(() => import("./pages/admin/AdminTestimonials"));
 const AdminMessages = lazy(() => import("./pages/admin/AdminMessages"));
+const AdminGallery = lazy(() => import("./pages/admin/AdminGallery"));
 const AdminNewsletter = lazy(() => import("./pages/admin/AdminNewsletter"));
 const AdminRevenue = lazy(() => import("./pages/admin/AdminRevenue"));
 const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
@@ -81,6 +82,7 @@ const AnimatedRoutes = () => {
           <Route path="blog" element={<AdminBlog />} />
           <Route path="testimonials" element={<AdminTestimonials />} />
           <Route path="messages" element={<AdminMessages />} />
+          <Route path="gallery" element={<AdminGallery />} />
           <Route path="newsletter" element={<AdminNewsletter />} />
           <Route path="social" element={<AdminSocial />} />
           <Route path="revenue" element={<AdminRevenue />} />
