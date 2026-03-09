@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: austinhouse_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      # Inject necessary environment variables automatically. Placeholders used.
+      - MONGODB_URI=mongodb+srv://dbuseraustin:9czck3sGNhWBM0gJ@austinhouse.sg4zrml.mongodb.net/?appName=austinhouse
+      - JWT_SECRET=docker_local_secret_string
+      - ALLOWED_ORIGINS=http://localhost
+    volumes:
+      # Sync the backend code for live development and easy seeding
+      - ./backend:/app
+      # Persist uploaded files across container restarts
+      - backend_uploads:/app/uploads
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: austinhouse_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  backend_uploads:
