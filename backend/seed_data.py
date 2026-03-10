@@ -50,6 +50,46 @@ async def seed_data():
                 "rating": 4.8,
                 "description": "Relieve stress and muscle tension with our customized massage therapy.",
                 "benefits": ["Muscle relaxation", "Stress reduction", "Improved circulation"]
+            },
+            {
+                "image": "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=800&auto=format&fit=crop",
+                "category": "Nails",
+                "title": "Luxury Spa Pedicure",
+                "duration": "45 min",
+                "price": "$55",
+                "rating": 4.7,
+                "description": "Pamper your feet with a relaxing soak, scrub, and polish.",
+                "benefits": ["Callus removal", "Moisturizing", "Flawless polish"]
+            },
+            {
+                "image": "https://images.unsplash.com/photo-1595476108010-b4d1f10o676a?w=800&auto=format&fit=crop",
+                "category": "Hair",
+                "title": "Bridal Styling & Updo",
+                "duration": "120 min",
+                "price": "$150",
+                "rating": 5.0,
+                "description": "Elegant and long-lasting hair styling for your special day.",
+                "benefits": ["Consultation included", "Long-lasting hold", "Accessory placement"]
+            },
+            {
+                "image": "https://images.unsplash.com/photo-1629367494173-c78a56567877?w=800&auto=format&fit=crop",
+                "category": "Laser",
+                "title": "Full Body Laser Hair Removal",
+                "duration": "180 min",
+                "price": "$399",
+                "rating": 4.9,
+                "description": "Painless and permanent hair reduction using advanced laser technology.",
+                "benefits": ["Permanent results", "Safe for all skin types", "Requires multiple sessions"]
+            },
+            {
+                "image": "https://images.unsplash.com/photo-1616394584738-fc6e612e71c9?w=800&auto=format&fit=crop",
+                "category": "Injection",
+                "title": "Botox Cosmetic (Per Unit)",
+                "duration": "30 min",
+                "price": "$12",
+                "rating": 4.8,
+                "description": "Smooth fine lines and wrinkles with FDA-approved injectables.",
+                "benefits": ["Quick procedure", "No downtime", "Results last 3-4 months"]
             }
         ]
         await services_coll.insert_many(services)
@@ -77,6 +117,38 @@ async def seed_data():
                 "price": "$32.00",
                 "priceNum": 32.00,
                 "description": "Vitamin C serum for bright and even skin tone."
+            },
+            {
+                "image": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&auto=format&fit=crop",
+                "name": "Purifying Clay Mask",
+                "category": "Masks",
+                "price": "$28.00",
+                "priceNum": 28.00,
+                "description": "Draws out impurities and minimizes pores with natural bentonite."
+            },
+            {
+                "image": "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=800&auto=format&fit=crop",
+                "name": "Gentle Foaming Cleanser",
+                "category": "Cleansers",
+                "price": "$22.00",
+                "priceNum": 22.00,
+                "description": "A daily cleanser that removes makeup without stripping moisture."
+            },
+            {
+                "image": "https://images.unsplash.com/photo-1571781526291-c477ebef0129?w=800&auto=format&fit=crop",
+                "name": "SPF 50 Mineral Sunscreen",
+                "category": "Sun Protection",
+                "price": "$35.00",
+                "priceNum": 35.00,
+                "description": "Broad-spectrum protection with a sheer, non-greasy finish."
+            },
+            {
+                "image": "https://images.unsplash.com/photo-1615397323145-a92c0199042a?w=800&auto=format&fit=crop",
+                "name": "Rosewater Hydrating Toner",
+                "category": "Toners",
+                "price": "$18.00",
+                "priceNum": 18.00,
+                "description": "Balances pH and refreshes skin instantly."
             }
         ]
         await products_coll.insert_many(products)
@@ -106,6 +178,42 @@ async def seed_data():
                 "bio": "Specialized in deep tissue and sports massage therapy.",
                 "image": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=400&auto=format&fit=crop",
                 "show_in_frontend": True
+            },
+            {
+                "name": "Jessica Taylor",
+                "role": "Nurse Injector",
+                "email": "jessica@austinhouse.com",
+                "phone": "555-0103",
+                "bio": "Registered Nurse specializing in Botox and dermal fillers.",
+                "image": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&auto=format&fit=crop",
+                "show_in_frontend": True
+            },
+            {
+                "name": "Michael Rodriguez",
+                "role": "Hair Stylist",
+                "email": "michael@austinhouse.com",
+                "phone": "555-0104",
+                "bio": "Creative director with a passion for color correction and bridal hair.",
+                "image": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&auto=format&fit=crop",
+                "show_in_frontend": True
+            },
+            {
+                "name": "Emily Davis",
+                "role": "Master Nail Technician",
+                "email": "emily@austinhouse.com",
+                "phone": "555-0105",
+                "bio": "Detail-oriented artist focused on nail health and intricate designs.",
+                "image": "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400&auto=format&fit=crop",
+                "show_in_frontend": True
+            },
+            {
+                "name": "Amanda White",
+                "role": "Laser Technician",
+                "email": "amanda@austinhouse.com",
+                "phone": "555-0106",
+                "bio": "Certified laser specialist dedicated to safe and effective hair removal.",
+                "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop",
+                "show_in_frontend": False
             }
         ]
         await staff_coll.insert_many(staff)
