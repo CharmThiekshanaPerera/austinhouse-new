@@ -13,15 +13,22 @@ jobs:
             - name: Checkout Code
               uses: actions/checkout@v4
 
-            - name: Deploy to Droplet via SSH
-              uses: appleboy/ssh-action@v1.0.3
+            - name: Set up SSH keys
+              uses: webfactory/ssh-agent@v0.9.0
               with:
-                  host: ${{ secrets.DROPLET_IP }}
-                  username: ${{ secrets.DROPLET_USERNAME }}
-                  key: ${{ secrets.DROPLET_SSH_KEY }}
-                  script: |
+                  ssh-private-key: ${{ secrets.DROPLET_SSH_KEY }}
+
+            - name: Add Droplet to known_hosts
+              run: |
+                  mkdir -p ~/.ssh
+                  ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+
+            - name: Deploy to Droplet via native SSH
+              run: |
+                  ssh -o StrictHostKeyChecking=no ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << 'EOF'
                       # Navigate to the project directory
                       cd /var/www/austinhouse-new
-
+                      
                       # Run the automated deployment script
                       bash deploy.sh
+                  EOF
