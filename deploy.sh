@@ -1,34 +1,22 @@
 #!/bin/bash
 # deploy.sh
-# Automated deployment script for DigitalOcean Droplet
+# Automated deployment script for DigitalOcean Droplet using Docker
 
 echo "=========================================="
-echo "🚀 Starting Austin House Deployment Update"
+echo "🚀 Starting Austin House Docker Deployment"
 echo "=========================================="
 
 # 1. Pull latest code
 echo "📦 Pulling latest changes from GitHub..."
 git pull origin main
 
-# 2. Build Frontend
-echo "🌐 Installing frontend dependencies and building..."
-npm install
-npm run build
+# 2. Rebuild and Restart Containers
+echo "🐳 Rebuilding and restarting Docker containers..."
+docker-compose up --build -d
 
-# 3. Update Backend
-echo "⚙️ Updating backend dependencies..."
-cd backend
-source venv/bin/activate
-pip install -r requirements.txt
-cd ..
-
-# 4. Restart Backend Service
-echo "🔄 Restarting FastAPI backend service (PM2)..."
-pm2 restart austinhouse-backend
-
-# 5. Restart Nginx (Optional, but good if proxy changes were pulled)
-echo "🔀 Restarting Nginx Server..."
-sudo systemctl restart nginx
+# 3. Clean up old images to save disk space
+echo "🧹 Cleaning up old unused Docker images..."
+docker image prune -af
 
 echo "=========================================="
 echo "✅ Deployment finished successfully!"
