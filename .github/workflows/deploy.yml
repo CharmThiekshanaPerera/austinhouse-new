@@ -25,7 +25,9 @@ jobs:
 
             - name: Deploy to Droplet via native SSH
               run: |
-                  ssh -o StrictHostKeyChecking=no ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << 'EOF'
+                  ssh -v -o StrictHostKeyChecking=accept-new \
+                      -o PasswordAuthentication=no \
+                      ${{ secrets.DROPLET_USERNAME }}@${{ secrets.DROPLET_IP }} << 'EOF'
                       # Navigate to the project directory
                       cd /var/www/austinhouse-new
                       
