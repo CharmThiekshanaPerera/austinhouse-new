@@ -9,27 +9,14 @@ import OtherServices from "@/components/OtherServices";
 import { Link } from "react-router-dom";
 import { Clock, Info, ArrowRight } from "lucide-react";
 import ServiceModal, { ServiceData } from "@/components/ServiceModal";
-
-const servicesData = [
-    {
-        id: "laser-wart",
-        title: "CO2 Laser Wart Removal (Small Area)",
-        duration: "30 mins",
-        price: "From 5,000.00/=",
-        description: "A fast, precise, and virtually painless procedure using advanced CO2 laser technology to vaporize warts and skin tags with minimal scarring.",
-        image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "laser-wart-large",
-        title: "CO2 Laser Removal (Large/Multiple)",
-        duration: "1 hr",
-        price: "From 12,000.00/=",
-        description: "Comprehensive removal of multiple skin tags or larger warts. Includes local anesthesia numbing cream for a comfortable experience.",
-        image: "https://images.unsplash.com/photo-1519014816548-bf5fe059e98b?auto=format&fit=crop&q=80"
-    }
-];
+import { useData } from "@/contexts/DataContext";
+import BookingModal from "@/components/BookingModal";
 
 const WartRemoval = () => {
+    const { services } = useData();
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+    const [bookingServiceTitle, setBookingServiceTitle] = useState("");
+    const pageServices = services.filter(s => s.category === "Wart Removal");
     const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -87,7 +74,7 @@ const WartRemoval = () => {
                     </div>
 
                     <div className="space-y-12">
-                        {servicesData.map((service, index) => (
+                        {pageServices.map((service, index) => (
                             <motion.div
                                 key={service.id}
                                 initial={{ opacity: 0, y: 40 }}
@@ -135,12 +122,7 @@ const WartRemoval = () => {
                                             </div>
                                         </div>
 
-                                        <Link
-                                            to={`/contact?service=${service.id}`}
-                                            className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20"
-                                        >
-                                            Book Now
-                                        </Link>
+                                        <button onClick={() => { setBookingServiceTitle(service.title); setIsBookingModalOpen(true); }} className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20">Book Now</button>
                                     </div>
                                 </div>
                             </motion.div>
@@ -199,6 +181,11 @@ const WartRemoval = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 service={selectedService}
+                onBookNow={(title) => {
+                    setIsModalOpen(false);
+                    setBookingServiceTitle(title);
+                    setIsBookingModalOpen(true);
+                }}
             />
         </div>
     );

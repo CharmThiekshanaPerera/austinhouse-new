@@ -10,35 +10,14 @@ import { ArrowRight, Clock, Info } from "lucide-react";
 import LazyImage from "@/components/LazyImage";
 import OtherServices from "@/components/OtherServices";
 import ServiceModal, { ServiceData } from "@/components/ServiceModal";
-
-const servicesData = [
-    {
-        id: "laser-hair-reduction",
-        title: "Laser Hair Reduction",
-        duration: "1 - 2 hrs",
-        price: "From 15,000.00/=",
-        description: "Achieve permanent hair reduction using advanced diode laser technology. Safe for all skin types, our laser treatments effectively target hair follicles to prevent future growth, ensuring long-lasting smooth skin.",
-        image: "https://images.unsplash.com/photo-1512290746430-3ffb4fab31bc?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "prp-therapy",
-        title: "PRP Therapy (Vampire Facial)",
-        duration: "1.5 hrs",
-        price: "45,000.00/=",
-        description: "Platelet-Rich Plasma therapy uses your body's own growth factors to stimulate collagen production. Excellent for acne scarring, overall skin rejuvenation, and restoring a youthful glow.",
-        image: "https://images.unsplash.com/photo-1519014816548-bf5fe059e98b?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "microneedling",
-        title: "Advanced Microneedling",
-        duration: "1 hr",
-        price: "22,000.00/=",
-        description: "A minimally invasive procedure that creates micro-punctures in the skin to trigger collagen and elastin synthesis. Highly effective for texture improvement and pore size reduction.",
-        image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80"
-    }
-];
+import { useData } from "@/contexts/DataContext";
+import BookingModal from "@/components/BookingModal";
 
 const SpecializedProcedures = () => {
+    const { services } = useData();
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+    const [bookingServiceTitle, setBookingServiceTitle] = useState("");
+    const pageServices = services.filter(s => s.category === "Specialized Procedures");
     const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -96,7 +75,7 @@ const SpecializedProcedures = () => {
                     </div>
 
                     <div className="space-y-12">
-                        {servicesData.map((service, index) => (
+                        {pageServices.map((service, index) => (
                             <motion.div
                                 key={service.id}
                                 initial={{ opacity: 0, y: 40 }}
@@ -144,12 +123,7 @@ const SpecializedProcedures = () => {
                                             </div>
                                         </div>
 
-                                        <Link
-                                            to={`/contact?service=${service.id}`}
-                                            className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20"
-                                        >
-                                            Book Now
-                                        </Link>
+                                        <button onClick={() => { setBookingServiceTitle(service.title); setIsBookingModalOpen(true); }} className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20">Book Now</button>
                                     </div>
                                 </div>
                             </motion.div>
@@ -208,6 +182,11 @@ const SpecializedProcedures = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 service={selectedService}
+                onBookNow={(title) => {
+                    setIsModalOpen(false);
+                    setBookingServiceTitle(title);
+                    setIsBookingModalOpen(true);
+                }}
             />
         </div>
     );

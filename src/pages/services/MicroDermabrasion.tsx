@@ -9,27 +9,14 @@ import OtherServices from "@/components/OtherServices";
 import { Link } from "react-router-dom";
 import { Clock, Info, ArrowRight } from "lucide-react";
 import ServiceModal, { ServiceData } from "@/components/ServiceModal";
-
-const servicesData = [
-    {
-        id: "diamond-micro",
-        title: "Diamond Micro-Dermabrasion",
-        duration: "1 hr",
-        price: "15,000.00/=",
-        description: "An exceptional exfoliating treatment using a diamond-tipped wand to gently sand away the thick outer layer of the skin. Rejuvenates sun-damaged skin, reduces acne scars, and evens out skin tone.",
-        image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "crystal-micro",
-        title: "Crystal Micro-Dermabrasion",
-        duration: "1 hr",
-        price: "12,000.00/=",
-        description: "Utilizes ultra-fine crystals to blast away dead skin cells. Excellent for deep exfoliation, unclogging pores, and preparing the skin for maximum serum absorption.",
-        image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80"
-    }
-];
+import { useData } from "@/contexts/DataContext";
+import BookingModal from "@/components/BookingModal";
 
 const MicroDermabrasion = () => {
+    const { services } = useData();
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+    const [bookingServiceTitle, setBookingServiceTitle] = useState("");
+    const pageServices = services.filter(s => s.category === "Micro-Dermabrasion");
     const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -87,7 +74,7 @@ const MicroDermabrasion = () => {
                     </div>
 
                     <div className="space-y-12">
-                        {servicesData.map((service, index) => (
+                        {pageServices.map((service, index) => (
                             <motion.div
                                 key={service.id}
                                 initial={{ opacity: 0, y: 40 }}
@@ -135,12 +122,7 @@ const MicroDermabrasion = () => {
                                             </div>
                                         </div>
 
-                                        <Link
-                                            to={`/contact?service=${service.id}`}
-                                            className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20"
-                                        >
-                                            Book Now
-                                        </Link>
+                                        <button onClick={() => { setBookingServiceTitle(service.title); setIsBookingModalOpen(true); }} className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20">Book Now</button>
                                     </div>
                                 </div>
                             </motion.div>
@@ -199,6 +181,11 @@ const MicroDermabrasion = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 service={selectedService}
+                onBookNow={(title) => {
+                    setIsModalOpen(false);
+                    setBookingServiceTitle(title);
+                    setIsBookingModalOpen(true);
+                }}
             />
         </div>
     );

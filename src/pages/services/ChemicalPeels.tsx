@@ -10,59 +10,14 @@ import { ArrowRight, Clock, Info } from "lucide-react";
 import LazyImage from "@/components/LazyImage";
 import OtherServices from "@/components/OtherServices";
 import ServiceModal, { ServiceData } from "@/components/ServiceModal";
-
-const peelsData = [
-    {
-        id: "fcr",
-        title: "Fractional Cell Regeneration Peel",
-        duration: "2.5 hrs",
-        price: "35,000.00/=",
-        description: "Revitalize your skin with our exclusive Fractional Cellular Repair (FCR) by activating the innate immune system and promoting blood circulation. This advanced treatment combines cutting-edge technology with natural extracts to promote deep skin renewal, reduces acne and acne scars, reduce fine lines, and restore youthful radiance.",
-        image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "sensitive",
-        title: "Sensitive Medical Peel",
-        duration: "1 hr",
-        price: "25,000.00/=",
-        description: "FOXC peel is an all-in-one premium skin healing program with fruit fermented acid, oxygen therapy, vitamin c, and polyphenol. This advanced treatment combines the power of exfoliation with antioxidant-rich formulas to unveil a smoother, more youthful complexion. Perfect for reducing fine lines, acne scars, unwanted hyper-pigmentation and wrinkles.",
-        image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "saree",
-        title: "Saree Jacket Line Peel",
-        duration: "1 hr",
-        price: "15,000.00/=",
-        description: "Enhance the beauty of the elegant saree you wear, by having your saree jacket line treated with us before your big day. Indulge in our rejuvenating body peel, tailored like the elegance of a meticulously crafted saree jacket.",
-        image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "back",
-        title: "Full Back Peel",
-        duration: "1.5 hrs",
-        price: "20,000.00/=",
-        description: "From neck to waist, let us treat you, to have the most soft and beautiful skin you always wanted, to wear that backless dress you dreamt about. Revitalize your skin with our rejuvenating full back peel.",
-        image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "booty",
-        title: "Booty Peel",
-        duration: "1 hr",
-        price: "30,000.00/=",
-        description: "Begin your journey to a flawless booty with foxcpeel. Rejuvenate your skin with our premium ingredients packed with antioxidants and treat your booty to the care it truly deserves!",
-        image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "vagi",
-        title: "Vagi Peel",
-        duration: "1.5 hrs",
-        price: "20,000.00/=",
-        description: "A gentle, yet effective peel designed to improve the texture and appearance of the intimate skin area. This treatment with its antioxidant rich formulas will help to exfoliate, brighten and unveil smoother skin. Especially designed for brightening darker vaginal areas, where you have the freedom to add on to include inside thighs if you wish for a full experience.",
-        image: "https://images.unsplash.com/photo-1552693673-1bf958298935?auto=format&fit=crop&q=80"
-    }
-];
+import { useData } from "@/contexts/DataContext";
+import BookingModal from "@/components/BookingModal";
 
 const ChemicalPeels = () => {
+    const { services } = useData();
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+    const [bookingServiceTitle, setBookingServiceTitle] = useState("");
+    const pageServices = services.filter(s => s.category === "Chemical Peels");
     const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -130,7 +85,7 @@ const ChemicalPeels = () => {
                     </div>
 
                     <div className="space-y-12">
-                        {peelsData.map((peel, index) => (
+                        {pageServices.map((peel, index) => (
                             <motion.div
                                 key={peel.id}
                                 initial={{ opacity: 0, y: 40 }}
@@ -245,6 +200,11 @@ const ChemicalPeels = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 service={selectedService}
+                onBookNow={(title) => {
+                    setIsModalOpen(false);
+                    setBookingServiceTitle(title);
+                    setIsBookingModalOpen(true);
+                }}
             />
         </div>
     );

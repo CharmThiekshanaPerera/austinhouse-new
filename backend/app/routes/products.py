@@ -14,7 +14,7 @@ router = APIRouter(prefix="/products", tags=["products"])
 
 def _doc_to_product(doc: dict) -> ProductOut:
     doc = {**doc}
-    doc["id"] = doc.pop("_id")
+    doc["id"] = str(doc.pop("_id"))
     return ProductOut.model_validate(doc)
 
 

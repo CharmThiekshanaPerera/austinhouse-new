@@ -9,35 +9,14 @@ import OtherServices from "@/components/OtherServices";
 import { Link } from "react-router-dom";
 import { Clock, Info, ArrowRight } from "lucide-react";
 import ServiceModal, { ServiceData } from "@/components/ServiceModal";
-
-const servicesData = [
-    {
-        id: "hifu",
-        title: "HIFU Face Lifting",
-        duration: "2 hrs",
-        price: "45,000.00/=",
-        description: "High-Intensity Focused Ultrasound (HIFU) delivers focused energy to the deep structural layers of the skin, stimulating collagen production for a non-surgical facelift effect.",
-        image: "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "rf-tightening",
-        title: "RF Skin Tightening",
-        duration: "1 hr",
-        price: "20,000.00/=",
-        description: "Radiofrequency treatments heat the dermal layers to immediately tighten existing collagen fibers and promote new collagen growth, reducing sagging and fine lines.",
-        image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "thermage",
-        title: "Thermage FLX",
-        duration: "1.5 hrs",
-        price: "75,000.00/=",
-        description: "The gold standard in non-invasive skin tightening. A single treatment provides immediate smoothing with results that continue to improve over six months.",
-        image: "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&q=80"
-    }
-];
+import { useData } from "@/contexts/DataContext";
+import BookingModal from "@/components/BookingModal";
 
 const AntiAgingTreatments = () => {
+    const { services } = useData();
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+    const [bookingServiceTitle, setBookingServiceTitle] = useState("");
+    const pageServices = services.filter(s => s.category === "Anti-aging Skin Tightening Treatments");
     const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -97,7 +76,7 @@ const AntiAgingTreatments = () => {
                     </div>
 
                     <div className="space-y-12">
-                        {servicesData.map((service, index) => (
+                        {pageServices.map((service, index) => (
                             <motion.div
                                 key={service.id}
                                 initial={{ opacity: 0, y: 40 }}
@@ -145,12 +124,7 @@ const AntiAgingTreatments = () => {
                                             </div>
                                         </div>
 
-                                        <Link
-                                            to={`/contact?service=${service.id}`}
-                                            className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20"
-                                        >
-                                            Book Now
-                                        </Link>
+                                        <button onClick={() => { setBookingServiceTitle(service.title); setIsBookingModalOpen(true); }} className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20">Book Now</button>
                                     </div>
                                 </div>
                             </motion.div>
@@ -209,6 +183,11 @@ const AntiAgingTreatments = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 service={selectedService}
+                onBookNow={(title) => {
+                    setIsModalOpen(false);
+                    setBookingServiceTitle(title);
+                    setIsBookingModalOpen(true);
+                }}
             />
         </div>
     );

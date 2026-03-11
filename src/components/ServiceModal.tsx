@@ -18,9 +18,10 @@ interface ServiceModalProps {
   isOpen: boolean;
   onClose: () => void;
   service: ServiceData | null;
+  onBookNow?: (title: string) => void;
 }
 
-const ServiceModal = ({ isOpen, onClose, service }: ServiceModalProps) => {
+const ServiceModal = ({ isOpen, onClose, service, onBookNow }: ServiceModalProps) => {
   // Prevent scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -105,13 +106,18 @@ const ServiceModal = ({ isOpen, onClose, service }: ServiceModalProps) => {
                   </div>
                 </div>
 
-                <Link
-                  to={`/contact?service=${service?.id}`}
-                  onClick={onClose}
+                <button
+                  onClick={() => {
+                    if (onBookNow && service) {
+                        onBookNow(service.title);
+                    } else {
+                        window.location.href = `/contact?service=${service?.id}`;
+                    }
+                  }}
                   className="w-full h-12 sm:h-14 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center gap-2 rounded-md font-bold tracking-wide transition-colors shadow-md shadow-gold/20 uppercase text-xs sm:text-sm"
                 >
                   Book This Treatment <ArrowRight size={16} className="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
-                </Link>
+                </button>
               </div>
             </div>
           </motion.div>

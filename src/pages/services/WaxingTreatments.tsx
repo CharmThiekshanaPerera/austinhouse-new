@@ -10,35 +10,14 @@ import { ArrowRight, Clock, Info } from "lucide-react";
 import LazyImage from "@/components/LazyImage";
 import OtherServices from "@/components/OtherServices";
 import ServiceModal, { ServiceData } from "@/components/ServiceModal";
-
-const servicesData = [
-    {
-        id: "full-body-wax",
-        title: "Full Body Waxing",
-        duration: "2 hrs",
-        price: "18,000.00/=",
-        description: "Enjoy silky smooth skin from head to toe. Our premium full body waxing uses gentle, hard wax formulations that minimize pain and reduce ingrown hairs, leaving your skin perfectly smooth for weeks.",
-        image: "https://images.unsplash.com/photo-1556228578-8d89b6acd8d3?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "brazilian-wax",
-        title: "Brazilian Wax",
-        duration: "45 mins",
-        price: "6,000.00/=",
-        description: "Complete hair removal using specialized sensitive-skin wax. Our highly trained staff ensures a comfortable, hygienic, and swift experience in a private, luxurious setting.",
-        image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "legs-arms",
-        title: "Half Legs & Arms",
-        duration: "1 hr",
-        price: "5,500.00/=",
-        description: "A quick maintenance session to keep your limbs flawlessly smooth. Finished with a deep hydrating oil massage to soothe the follicles.",
-        image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80"
-    }
-];
+import { useData } from "@/contexts/DataContext";
+import BookingModal from "@/components/BookingModal";
 
 const WaxingTreatments = () => {
+    const { services } = useData();
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+    const [bookingServiceTitle, setBookingServiceTitle] = useState("");
+    const pageServices = services.filter(s => s.category === "Waxing Treatments");
     const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -98,7 +77,7 @@ const WaxingTreatments = () => {
                     </div>
 
                     <div className="space-y-12">
-                        {servicesData.map((service, index) => (
+                        {pageServices.map((service, index) => (
                             <motion.div
                                 key={service.id}
                                 initial={{ opacity: 0, y: 40 }}
@@ -146,12 +125,7 @@ const WaxingTreatments = () => {
                                             </div>
                                         </div>
 
-                                        <Link
-                                            to={`/contact?service=${service.id}`}
-                                            className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20"
-                                        >
-                                            Book Now
-                                        </Link>
+                                        <button onClick={() => { setBookingServiceTitle(service.title); setIsBookingModalOpen(true); }} className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20">Book Now</button>
                                     </div>
                                 </div>
                             </motion.div>
@@ -210,6 +184,11 @@ const WaxingTreatments = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 service={selectedService}
+                onBookNow={(title) => {
+                    setIsModalOpen(false);
+                    setBookingServiceTitle(title);
+                    setIsBookingModalOpen(true);
+                }}
             />
         </div>
     );

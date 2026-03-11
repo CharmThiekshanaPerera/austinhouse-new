@@ -10,37 +10,18 @@ import { ArrowRight, Clock, Info } from "lucide-react";
 import LazyImage from "@/components/LazyImage";
 import OtherServices from "@/components/OtherServices";
 import ServiceModal, { ServiceData } from "@/components/ServiceModal";
-
-const servicesData = [
-    {
-        id: "signature-facial",
-        title: "Signature Gold Facial",
-        duration: "1.5 hrs",
-        price: "15,000.00/=",
-        description: "Experience the ultimate luxury with our 24K Signature Gold Facial. Designed to illuminate your complexion, reduce fine lines, and deeply nourish the skin using pure gold extracts and advanced serums.",
-        image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "deep-cleanse",
-        title: "Deep Cleansing Acne Facial",
-        duration: "1 hr",
-        price: "12,000.00/=",
-        description: "A targeted treatment for blemish-prone skin. Includes rigorous extraction, high-frequency therapy to eliminate acne-causing bacteria, and a soothing mask to reduce inflammation.",
-        image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "hydra-facial",
-        title: "Hydra-Glow Therapy",
-        duration: "1.5 hrs",
-        price: "18,000.00/=",
-        description: "Instantly plump and hydrate your skin with our multi-step hydra therapy. Uses vortex-fusion technology to cleanse, extract, and intensely hydrate for an undeniable post-facial glow.",
-        image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80"
-    }
-];
-
+import { useData, Service } from "@/contexts/DataContext";
+import BookingModal from "@/components/BookingModal";
 const Facials = () => {
+    const { services } = useData();
     const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    // Booking modal state
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+    const [bookingServiceTitle, setBookingServiceTitle] = useState("");
+
+    const pageServices = services.filter(s => s.category === "Facials");
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -100,7 +81,7 @@ const Facials = () => {
                     </div>
 
                     <div className="space-y-12">
-                        {servicesData.map((service, index) => (
+                        {pageServices.map((service, index) => (
                             <motion.div
                                 key={service.id}
                                 initial={{ opacity: 0, y: 40 }}
@@ -121,7 +102,14 @@ const Facials = () => {
                                         </p>
                                         <button 
                                             onClick={() => {
-                                                setSelectedService(service);
+                                                setSelectedService({
+                                                    id: service.id,
+                                                    title: service.title,
+                                                    duration: service.duration,
+                                                    price: service.price,
+                                                    description: service.description,
+                                                    image: service.image
+                                                });
                                                 setIsModalOpen(true);
                                             }}
                                             className="text-primary font-bold text-sm hover:text-gold flex items-center gap-1 transition-colors uppercase tracking-wider"
@@ -148,12 +136,15 @@ const Facials = () => {
                                             </div>
                                         </div>
 
-                                        <Link
-                                            to={`/contact?service=${service.id}`}
+                                        <button
+                                            onClick={() => {
+                                                setBookingServiceTitle(service.title);
+                                                setIsBookingModalOpen(true);
+                                            }}
                                             className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20"
                                         >
                                             Book Now
-                                        </Link>
+                                        </button>
                                     </div>
                                 </div>
                             </motion.div>
@@ -213,6 +204,17 @@ const Facials = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 service={selectedService}
+                onBookNow={(title) => {
+                    setIsModalOpen(false);
+                    setBookingServiceTitle(title);
+                    setIsBookingModalOpen(true);
+                }}
+            />
+
+            <BookingModal
+                open={isBookingModalOpen}
+                onOpenChange={setIsBookingModalOpen}
+                preselectedService={bookingServiceTitle}
             />
         </div>
     );

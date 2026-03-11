@@ -22,7 +22,7 @@ def _compute_status(stock_qty: int, reorder_level: int) -> InventoryStatus:
 
 def _doc_to_inventory(doc: dict) -> InventoryOut:
     doc = {**doc}
-    doc["id"] = doc.pop("_id")
+    doc["id"] = str(doc.pop("_id"))
     return InventoryOut.model_validate(doc)
 
 

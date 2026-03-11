@@ -9,27 +9,14 @@ import OtherServices from "@/components/OtherServices";
 import { Link } from "react-router-dom";
 import { Clock, Info, ArrowRight } from "lucide-react";
 import ServiceModal, { ServiceData } from "@/components/ServiceModal";
-
-const servicesData = [
-    {
-        id: "intimate-brightening",
-        title: "Intimate Area Brightening",
-        duration: "1 hr",
-        price: "18,000.00/=",
-        description: "A specialized, gentle treatment designed to safely reduce hyperpigmentation in delicate areas. Uses medical-grade brightening serums and mild exfoliants for an even skin tone.",
-        image: "https://images.unsplash.com/photo-1552693673-1bf958298935?auto=format&fit=crop&q=80"
-    },
-    {
-        id: "bikini-facial",
-        title: "Bikini Line Facial (Vajacial)",
-        duration: "45 mins",
-        price: "12,000.00/=",
-        description: "Perfect for post-wax care. This soothing treatment cleanses, gently exfoliates, extracts ingrown hairs, and deeply moisturizes the bikini line for flawless, bump-free skin.",
-        image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80"
-    }
-];
+import { useData } from "@/contexts/DataContext";
+import BookingModal from "@/components/BookingModal";
 
 const IntimateAreaServices = () => {
+    const { services } = useData();
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+    const [bookingServiceTitle, setBookingServiceTitle] = useState("");
+    const pageServices = services.filter(s => s.category === "Intimate Area Services");
     const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -87,7 +74,7 @@ const IntimateAreaServices = () => {
                     </div>
 
                     <div className="space-y-12">
-                        {servicesData.map((service, index) => (
+                        {pageServices.map((service, index) => (
                             <motion.div
                                 key={service.id}
                                 initial={{ opacity: 0, y: 40 }}
@@ -135,12 +122,7 @@ const IntimateAreaServices = () => {
                                             </div>
                                         </div>
 
-                                        <Link
-                                            to={`/contact?service=${service.id}`}
-                                            className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20"
-                                        >
-                                            Book Now
-                                        </Link>
+                                        <button onClick={() => { setBookingServiceTitle(service.title); setIsBookingModalOpen(true); }} className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20">Book Now</button>
                                     </div>
                                 </div>
                             </motion.div>
@@ -199,6 +181,11 @@ const IntimateAreaServices = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 service={selectedService}
+                onBookNow={(title) => {
+                    setIsModalOpen(false);
+                    setBookingServiceTitle(title);
+                    setIsBookingModalOpen(true);
+                }}
             />
         </div>
     );
