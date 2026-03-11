@@ -4,7 +4,6 @@ import { ShoppingBag } from "lucide-react";
 import { useState, useMemo } from "react";
 import Footer from "@/components/Footer";
 import CartSidebar from "@/components/CartSidebar";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import SEO from "@/components/SEO";
 import { useCart } from "@/contexts/CartContext";
 import { useData } from "@/contexts/DataContext";
@@ -165,7 +164,6 @@ const Products = () => {
 
       <Footer />
       <CartSidebar />
-      <WhatsAppButton />
     </div>
   );
 };

@@ -146,6 +146,7 @@ BookingStatus = Literal["Pending", "Confirmed", "Cancelled", "Completed"]
 class BookingBase(BaseModel):
     customer_name: str
     customer_email: str
+    customer_phone: Optional[str] = None
     service_id: str
     staff_id: Optional[str] = None
     date: str
@@ -159,6 +160,7 @@ class BookingCreate(BookingBase):
 class BookingUpdate(BaseModel):
     customer_name: Optional[str] = None
     customer_email: Optional[str] = None
+    customer_phone: Optional[str] = None
     service_id: Optional[str] = None
     staff_id: Optional[str] = None
     date: Optional[str] = None
@@ -266,6 +268,7 @@ class GalleryImageBase(BaseModel):
     image: str
     alt: str
     category: GalleryCategory
+    type: Literal["image", "video"] = "image"
 
 class GalleryImageCreate(GalleryImageBase):
     pass
@@ -274,6 +277,7 @@ class GalleryImageUpdate(BaseModel):
     image: Optional[str] = None
     alt: Optional[str] = None
     category: Optional[GalleryCategory] = None
+    type: Optional[Literal["image", "video"]] = None
 
 class GalleryImageOut(GalleryImageBase):
     id: str
@@ -295,4 +299,19 @@ class BeforeAfterUpdate(BaseModel):
     description: Optional[str] = None
 
 class BeforeAfterOut(BeforeAfterBase):
+    id: str
+
+
+class SubscriberBase(BaseModel):
+    email: str
+    active: bool = True
+    created_at: str
+
+class SubscriberCreate(BaseModel):
+    email: str
+
+class SubscriberUpdate(BaseModel):
+    active: bool
+
+class SubscriberOut(SubscriberBase):
     id: str

@@ -2,11 +2,10 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import SEO from "@/components/SEO";
 import { useEffect } from "react";
 
-const serviceCategories = [
+export const serviceCategories = [
   { id: 'facials', name: 'Facials', image: '/category_images/facials.png', path: '/services/facials' },
   { id: 'chemical-peels', name: 'Chemical Peels', image: '/category_images/peels.png', path: '/services/chemical-peels' },
   { id: 'waxing', name: 'Waxing Treatments', image: '/category_images/waxing.png', path: '/services/waxing' },
@@ -132,7 +131,6 @@ const Services = () => {
       </section>
 
       <Footer />
-      <WhatsAppButton />
     </div>
   );
 };

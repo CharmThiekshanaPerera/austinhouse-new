@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Pencil, Trash2, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, Eye } from "lucide-react";
 import { useData, Service } from "@/contexts/DataContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { uploadImage } from "@/lib/uploadsApi";
+import ServiceModal from "@/components/ServiceModal";
 
 const SERVICE_CATEGORIES = [
   "Facials",
@@ -277,6 +278,7 @@ const AdminServices = () => {
   const { services, addService, updateService, deleteService } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Service | null>(null);
+  const [previewing, setPreviewing] = useState<Service | null>(null);
 
   const handleSave = async (data: ServiceFormData) => {
     try {
@@ -333,6 +335,7 @@ const AdminServices = () => {
                 </p>
               </div>
               <div className="flex gap-2 flex-shrink-0">
+                <Button size="sm" variant="outline" onClick={() => setPreviewing(s)}><Eye size={14} /></Button>
                 <Button size="sm" variant="outline" onClick={() => { setEditing(s); setShowForm(false); }}><Pencil size={14} /></Button>
                 <Button
                   size="sm"
@@ -359,6 +362,19 @@ const AdminServices = () => {
           </Card>
         ))}
       </div>
+
+      {/* Service Preview Modal */}
+      {previewing && (
+        <ServiceModal
+          service={previewing}
+          isOpen={!!previewing}
+          onClose={() => setPreviewing(null)}
+          onBookNow={() => {
+             setPreviewing(null);
+             toast({ title: "Preview Mode", description: "Booking is disabled in admin preview." });
+          }}
+        />
+      )}
     </div>
   );
 };

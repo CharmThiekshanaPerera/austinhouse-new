@@ -51,7 +51,7 @@ const InstagramWall = () => {
                         <span>Follow Us</span>
                     </div>
                     <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-6">
-                        @AustinHouse<span className="text-gold-gradient">Spa</span>
+                        @austinhouse_<span className="text-gold-gradient">aestheticcentre</span>
                     </h2>
                     <p className="text-muted-foreground font-body text-lg">
                         Join our community for daily beauty inspiration, exclusive offers,
@@ -102,7 +102,7 @@ const InstagramWall = () => {
                 {/* Call to action button */}
                 <div className="text-center mt-12">
                     <a
-                        href="https://instagram.com"
+                        href="https://www.instagram.com/austinhouse_aestheticcentre/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent border border-primary text-primary hover:bg-primary hover:text-white rounded-full font-body font-medium transition-all duration-300 group"

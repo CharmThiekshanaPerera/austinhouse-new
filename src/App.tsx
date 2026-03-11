@@ -10,6 +10,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import PageTransition from "@/components/PageTransition";
 import ChatBot from "@/components/ChatBot";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import WelcomeVoice from "@/components/WelcomeVoice";
 import PublicLayout from "@/pages/PublicLayout";
 
@@ -132,10 +133,17 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <ScrollToTop />
               <WelcomeVoice />
               <AnimatedRoutes />
-              <ChatBot />
+              
+              {/* Global Floating Widgets Container */}
+              <div className="fixed bottom-6 right-6 z-[60] flex flex-col md:flex-row items-center gap-3 md:gap-4 pointer-events-none">
+                <div className="pointer-events-auto flex flex-col-reverse md:flex-row items-center gap-3 md:gap-4">
+                  <ScrollToTop />
+                  <WhatsAppButton />
+                  <ChatBot />
+                </div>
+              </div>
             </BrowserRouter>
           </CartProvider>
         </DataProvider>

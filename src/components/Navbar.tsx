@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Search, Instagram, Facebook, ChevronDown } from "lucide-react";
+import { Menu, X, Search, Instagram, Facebook, ChevronDown, ArrowRight, Phone, Mail } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/logo.png";
 
@@ -27,29 +27,46 @@ const servicesMenu = [
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const allSearchableItems = [
+    ...navLinks.map(l => ({ title: l.label, href: l.href, category: "Page" })),
+    ...servicesMenu.map(s => ({ title: s.label, href: s.href, category: "Service" }))
+  ];
+
+  const filteredResults = searchQuery.trim() === "" 
+    ? [] 
+    : allSearchableItems.filter(item => 
+        item.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-charcoal/90 backdrop-blur-md">
       {/* Top bar with social icons and announcement */}
       <div className="bg-primary/90 text-primary-foreground">
-        <div className="container mx-auto px-4 lg:px-8 flex items-center justify-between py-1.5">
-          <div className="hidden sm:flex items-center gap-3">
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" aria-label="Instagram">
-              <Instagram size={14} />
+        <div className="container mx-auto px-4 lg:px-8 flex flex-col sm:flex-row items-center justify-between py-1.5 gap-2 sm:gap-0">
+          <div className="flex items-center gap-4 text-xs font-body">
+            <div className="flex items-center gap-3 border-r border-white/20 pr-4 mr-1">
+              <a href="https://www.instagram.com/austinhouse_aestheticcentre/" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors" aria-label="Instagram">
+                <Instagram size={14} />
+              </a>
+              <a href="https://www.facebook.com/austincolombo7" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors" aria-label="Facebook">
+                <Facebook size={14} />
+              </a>
+            </div>
+            <a href="tel:+94112196386" className="flex items-center gap-1.5 hover:text-gold transition-colors">
+              <Phone size={12} className="text-gold" />
+              <span>+94 112196386</span>
             </a>
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" aria-label="Facebook">
-              <Facebook size={14} />
-            </a>
-            <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" aria-label="TikTok">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
-              </svg>
+            <a href="mailto:info@austinhouse.lk" className="hidden md:flex items-center gap-1.5 hover:text-gold transition-colors">
+              <Mail size={12} className="text-gold" />
+              <span>info@austinhouse.lk</span>
             </a>
           </div>
-          <p className="text-sm font-body tracking-wide text-center flex-1">
-            Begin your radiant journey with us — discover gold standard beauty care!
+          <p className="text-[11px] sm:text-xs font-body tracking-wide text-center sm:text-right opacity-90">
+            Begin your radiant journey with us — gold standard beauty care!
           </p>
-          <div className="hidden sm:block w-[70px]" />
         </div>
       </div>
 
@@ -80,7 +97,7 @@ const Navbar = () => {
 
                 {link.hasDropdown && (
                   <div className="absolute top-full -left-4 pt-2 hidden group-hover:block w-72">
-                    <div className="bg-[#002B4B] rounded-md shadow-2xl py-3 overflow-hidden border border-gold/10">
+                    <div className="bg-[#0A1A2F] rounded-md shadow-2xl py-3 overflow-hidden border border-gold/10">
                       {servicesMenu.map((item) => (
                         <Link
                           key={item.label}
@@ -95,18 +112,31 @@ const Navbar = () => {
                 )}
               </div>
             ))}
-            <button className="text-cream/60 hover:text-gold transition-colors" aria-label="Search">
+            <button 
+              className="text-cream/60 hover:text-gold transition-colors" 
+              aria-label="Search"
+              onClick={() => setIsSearchOpen(true)}
+            >
               <Search size={18} />
             </button>
           </div>
 
-          <button
-            className="lg:hidden text-cream"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="flex items-center gap-4 lg:hidden">
+            <button 
+              className="text-cream/80 hover:text-gold transition-colors" 
+              aria-label="Search"
+              onClick={() => setIsSearchOpen(true)}
+            >
+              <Search size={20} />
+            </button>
+            <button
+              className="text-cream"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
+            >
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -145,12 +175,87 @@ const Navbar = () => {
                 </div>
               ))}
               <div className="flex items-center gap-4 pt-2">
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-gold-light transition-colors" aria-label="Instagram">
+                <a href="https://www.instagram.com/austinhouse_aestheticcentre/" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-gold-light transition-colors" aria-label="Instagram">
                   <Instagram size={20} />
                 </a>
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-gold-light transition-colors" aria-label="Facebook">
+                <a href="https://www.facebook.com/austincolombo7" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-gold-light transition-colors" aria-label="Facebook">
                   <Facebook size={20} />
                 </a>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Search Overlay */}
+      <AnimatePresence>
+        {isSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-charcoal/95 backdrop-blur-xl flex flex-col items-center pt-20 px-6"
+          >
+            <button 
+              className="absolute top-8 right-8 text-cream/60 hover:text-gold transition-colors"
+              onClick={() => {
+                setIsSearchOpen(false);
+                setSearchQuery("");
+              }}
+            >
+              <X size={32} />
+            </button>
+            
+            <div className="w-full max-w-2xl">
+              <div className="relative border-b-2 border-gold/30 focus-within:border-gold transition-colors pb-4 mb-12">
+                <Search size={24} className="absolute left-0 top-1 text-gold/50" />
+                <input 
+                  autoFocus
+                  type="text"
+                  placeholder="What are you looking for?"
+                  className="w-full bg-transparent border-none outline-none text-2xl md:text-4xl font-display text-white pl-10 placeholder:text-white/20"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-4 max-h-[50vh] overflow-y-auto custom-scrollbar">
+                {searchQuery.trim() !== "" && filteredResults.length > 0 ? (
+                  <div className="grid gap-2">
+                    {filteredResults.map((result, idx) => (
+                      <Link
+                        key={`${result.href}-${idx}`}
+                        to={result.href}
+                        onClick={() => {
+                          setIsSearchOpen(false);
+                          setSearchQuery("");
+                        }}
+                        className="group flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-gold/10 border border-white/5 hover:border-gold/20 transition-all"
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs uppercase tracking-widest text-gold/60 mb-1">{result.category}</span>
+                          <span className="text-lg text-cream group-hover:text-gold transition-colors">{result.title}</span>
+                        </div>
+                        <ArrowRight size={20} className="text-gold opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all" />
+                      </Link>
+                    ))}
+                  </div>
+                ) : searchQuery.trim() !== "" ? (
+                  <p className="text-center text-cream/40 font-body py-10">No matches found for "{searchQuery}"</p>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 opacity-40">
+                    <p className="col-span-full text-xs uppercase tracking-[0.2em] text-white/40 mb-2">Suggested Searches</p>
+                    {["Facials", "Peels", "Anti-aging", "Waxing"].map(suggest => (
+                      <button 
+                        key={suggest}
+                        onClick={() => setSearchQuery(suggest)}
+                        className="text-left px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-cream transition-colors"
+                      >
+                        {suggest}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

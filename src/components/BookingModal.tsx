@@ -29,6 +29,7 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
   const [timeSlot, setTimeSlot] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const { addBooking, services } = useData();
 
@@ -50,18 +51,20 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
       setTimeSlot("");
       setName("");
       setEmail("");
+      setPhone("");
     }
   }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!date || !serviceId || !timeSlot || !name || !email) return;
+    if (!date || !serviceId || !timeSlot || !name || !email || !phone) return;
 
     setSubmitting(true);
     try {
       await addBooking({
         customer_name: name,
         customer_email: email,
+        customer_phone: phone,
         service_id: serviceId,
         staff_id: null,
         date: format(date, "yyyy-MM-dd"),
@@ -166,8 +169,7 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
             </div>
           </div>
 
-          {/* Name & Email */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-body text-muted-foreground mb-2">Your Name</label>
               <input
@@ -190,11 +192,22 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
                 placeholder="you@example.com"
               />
             </div>
+            <div>
+              <label className="block text-sm font-body text-muted-foreground mb-2">Phone</label>
+              <input
+                type="tel"
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-4 py-3 bg-background border border-border rounded-sm font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                placeholder="+94 7X XXX XXXX"
+              />
+            </div>
           </div>
 
           <button
             type="submit"
-            disabled={!date || !serviceId || !timeSlot || !name || !email || submitting}
+            disabled={!date || !serviceId || !timeSlot || !name || !email || !phone || submitting}
             className="w-full py-4 bg-gold-gradient text-primary-foreground font-body font-bold tracking-wider uppercase text-sm rounded-sm shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {submitting && <Loader2 size={16} className="animate-spin" />}

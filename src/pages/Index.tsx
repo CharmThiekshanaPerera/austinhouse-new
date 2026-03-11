@@ -13,7 +13,6 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import CTABanner from "@/components/CTABanner";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import SEO from "@/components/SEO";
 import StatsSection from "@/components/StatsSection";
 import TeamSection from "@/components/TeamSection";
@@ -83,7 +82,6 @@ const Index = () => {
       <CTABanner />
       <FAQSection />
       <Footer />
-      <WhatsAppButton />
     </div>
   );
 };

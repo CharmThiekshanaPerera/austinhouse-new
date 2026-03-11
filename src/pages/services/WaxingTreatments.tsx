@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
+
 import CTABanner from "@/components/CTABanner";
 import SEO from "@/components/SEO";
 import { Link } from "react-router-dom";
@@ -178,7 +178,7 @@ const WaxingTreatments = () => {
       <OtherServices currentPath="/services/waxing" />
       <CTABanner />
             <Footer />
-            <WhatsAppButton />
+
 
             <ServiceModal 
                 isOpen={isModalOpen}

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
+
 import CTABanner from "@/components/CTABanner";
 import SEO from "@/components/SEO";
 import OtherServices from "@/components/OtherServices";
@@ -175,7 +175,7 @@ const IntimateAreaServices = () => {
       <OtherServices currentPath="/services/intimate" />
       <CTABanner />
             <Footer />
-            <WhatsAppButton />
+
 
             <ServiceModal 
                 isOpen={isModalOpen}

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Award, Heart, Shield, Users } from "lucide-react";
 import Footer from "@/components/Footer";
 import TeamSection from "@/components/TeamSection";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import SEO from "@/components/SEO";
 import AnimatedCounter from "@/components/AnimatedCounter";
 
@@ -183,7 +182,6 @@ const About = () => {
       </section>
 
       <Footer />
-      <WhatsAppButton />
     </div>
   );
 };

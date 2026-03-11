@@ -8,9 +8,18 @@ import { blogApi } from "@/lib/blogApi";
 import { waitlistApi } from "@/lib/waitlistApi";
 import { testimonialsApi } from "@/lib/testimonialsApi";
 import { contactMessagesApi } from "@/lib/contactMessagesApi";
-import { galleryImagesApi, beforeAfterApi, GalleryImage, BeforeAfterPair } from "@/lib/galleryApi";
+import { subscribersApi } from "@/lib/subscribersApi";
+import { galleryImagesApi, beforeAfterApi, BeforeAfterPair } from "@/lib/galleryApi";
 
-export type { GalleryImage, BeforeAfterPair } from "@/lib/galleryApi";
+export type { BeforeAfterPair } from "@/lib/galleryApi";
+
+export interface GalleryImage {
+  id: string;
+  image: string;
+  alt: string;
+  category: "Environment" | "Treatments" | "Results" | "Products" | "Before/After";
+  type: "image" | "video";
+}
 
 export interface Product {
   id: string;
@@ -39,6 +48,7 @@ export interface Booking {
   id: string;
   customer_name: string;
   customer_email: string;
+  customer_phone?: string | null;
   service_id: string;
   staff_id?: string | null;
   date: string;
@@ -163,6 +173,7 @@ interface DataContextType {
   testimonialsLoading: boolean;
   contactMessagesLoading: boolean;
   galleryLoading: boolean;
+  subscribersLoading: boolean;
   // Products
   addProduct: (p: Omit<Product, "id">) => Promise<Product>;
   updateProduct: (p: Product) => Promise<Product>;
@@ -205,10 +216,11 @@ interface DataContextType {
   addBeforeAfterPair: (pair: Omit<BeforeAfterPair, "id">) => Promise<BeforeAfterPair>;
   deleteBeforeAfterPair: (id: string) => Promise<void>;
   updateBeforeAfterPair: (id: string, pair: Partial<Omit<BeforeAfterPair, "id">>) => Promise<BeforeAfterPair>;
+  // Subscribers (API-backed)
+  addNewsletterSubscriber: (email: string) => Promise<NewsletterSubscriber>;
+  updateNewsletterSubscriber: (s: NewsletterSubscriber) => Promise<NewsletterSubscriber>;
+  deleteNewsletterSubscriber: (id: string) => Promise<void>;
   // Local-only
-  addNewsletterSubscriber: (email: string) => void;
-  updateNewsletterSubscriber: (s: NewsletterSubscriber) => void;
-  deleteNewsletterSubscriber: (id: string) => void;
   addRevenueEntry: (r: Omit<RevenueEntry, "id" | "createdAt">) => void;
   updateRevenueEntry: (r: RevenueEntry) => void;
   deleteRevenueEntry: (id: string) => void;
@@ -250,6 +262,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [testimonialsLoading, setTestimonialsLoading] = useState(true);
   const [contactMessagesLoading, setContactMessagesLoading] = useState(true);
   const [galleryLoading, setGalleryLoading] = useState(true);
+  const [subscribersLoading, setSubscribersLoading] = useState(true);
 
   const addActivityLog = (action: string, detail: string) =>
     setActivityLogs(prev =>
@@ -395,6 +408,22 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         console.warn("Failed to load contact messages from API.", e);
       } finally {
         if (!cancelled) setContactMessagesLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // ─── Subscribers ────────────────────────────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const remote = await subscribersApi.list();
+        if (!cancelled) setNewsletterSubscribers(remote);
+      } catch (e) {
+        console.warn("Failed to load subscribers from API.", e);
+      } finally {
+        if (!cancelled) setSubscribersLoading(false);
       }
     })();
     return () => { cancelled = true; };
@@ -645,18 +674,24 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   // ─── Local-only CRUD ────────────────────────────────────────────────────────
 
-  const addNewsletterSubscriber = (email: string) => {
-    setNewsletterSubscribers(prev => [
-      ...prev,
-      { id: `ns_${Date.now()}`, email, active: true, subscribedAt: new Date().toISOString() },
-    ]);
+  const addNewsletterSubscriber = async (email: string) => {
+    const created = await subscribersApi.create(email);
+    setNewsletterSubscribers(prev => {
+      if (prev.find(s => s.id === created.id)) return prev;
+      return [...prev, created];
+    });
     addActivityLog("Newsletter Subscriber", email);
+    return created;
   };
 
-  const updateNewsletterSubscriber = (s: NewsletterSubscriber) =>
-    setNewsletterSubscribers(prev => prev.map(x => (x.id === s.id ? s : x)));
+  const updateNewsletterSubscriber = async (s: NewsletterSubscriber) => {
+    const updated = await subscribersApi.update(s.id, s.active);
+    setNewsletterSubscribers(prev => prev.map(x => (x.id === updated.id ? updated : x)));
+    return updated;
+  };
 
-  const deleteNewsletterSubscriber = (id: string) => {
+  const deleteNewsletterSubscriber = async (id: string) => {
+    await subscribersApi.remove(id);
     setNewsletterSubscribers(prev => prev.filter(x => x.id !== id));
     addActivityLog("Subscriber Removed", id);
   };
@@ -703,6 +738,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         testimonialsLoading,
         contactMessagesLoading,
         galleryLoading,
+        subscribersLoading,
         addProduct,
         updateProduct,
         deleteProduct,

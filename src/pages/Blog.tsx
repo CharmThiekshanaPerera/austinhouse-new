@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { Calendar, ArrowLeft, Search } from "lucide-react";
 import { useData, BlogPost } from "@/contexts/DataContext";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import SEO from "@/components/SEO";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -98,7 +97,6 @@ const Blog = () => {
         </article>
 
         <Footer />
-        <WhatsAppButton />
       </div>
     );
   }
@@ -224,7 +222,6 @@ const Blog = () => {
       </section>
 
       <Footer />
-      <WhatsAppButton />
     </div>
   );
 };
