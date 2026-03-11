@@ -181,7 +181,7 @@ const AdminGallery = () => {
 
                             return (
                                 <div key={img.id} className="group relative rounded-lg overflow-hidden border border-border">
-                                    <div className="relative">
+                                    <div className="relative group">
                                         <img src={displayImage} alt={img.alt} className="w-full h-32 object-cover" />
                                         {isVideo && (
                                             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
@@ -190,6 +190,20 @@ const AdminGallery = () => {
                                                 </div>
                                             </div>
                                         )}
+                                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Button 
+                                                variant="destructive" 
+                                                size="icon" 
+                                                className="h-8 w-8" 
+                                                onClick={() => {
+                                                    if (window.confirm("Are you sure you want to delete this image?")) {
+                                                        deleteGalleryImage(img.id);
+                                                    }
+                                                }}
+                                            >
+                                                <Trash2 size={14} />
+                                            </Button>
+                                        </div>
                                     </div>
                                     <div className="p-3 bg-card border-t border-border">
                                         <p className="font-semibold text-sm truncate">{img.alt}</p>
@@ -222,7 +236,16 @@ const AdminGallery = () => {
                                     <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{pair.description}</p>
                                 </div>
                                 <div className="absolute top-2 right-2">
-                                    <Button variant="destructive" size="icon" className="h-8 w-8" onClick={() => deleteBeforeAfterPair(pair.id)}>
+                                    <Button 
+                                        variant="destructive" 
+                                        size="icon" 
+                                        className="h-8 w-8" 
+                                        onClick={() => {
+                                            if (window.confirm("Are you sure you want to delete this transformation?")) {
+                                                deleteBeforeAfterPair(pair.id);
+                                            }
+                                        }}
+                                    >
                                         <Trash2 size={14} />
                                     </Button>
                                 </div>

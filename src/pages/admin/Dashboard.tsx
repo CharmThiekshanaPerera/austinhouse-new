@@ -1,4 +1,4 @@
-import { Package, Scissors, CalendarDays, Mail, Star, Clock, Users, UserCog } from "lucide-react";
+import { Package, Scissors, CalendarDays, Mail, Star, Clock, Users, UserCog, ShoppingBag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useData } from "@/contexts/DataContext";
@@ -16,7 +16,7 @@ const statusConfig = {
 const Dashboard = () => {
   const {
     products, services, bookings, contactMessages, testimonials,
-    staff, customers, waitlistEntries,
+    staff, customers, waitlistEntries, orders
   } = useData();
 
   const unreadMessages = contactMessages.filter(m => !m.read).length;
@@ -32,6 +32,7 @@ const Dashboard = () => {
     { label: "Waitlist", value: waitlistEntries.length, icon: Clock, color: "text-orange-500" },
     { label: "Testimonials", value: testimonials.length, icon: Star, color: "text-yellow-500" },
     { label: "Messages", value: contactMessages.length, sub: `${unreadMessages} unread`, icon: Mail, color: "text-indigo-500" },
+    { label: "Orders", value: orders.length, icon: ShoppingBag, color: "text-rose-500" },
   ];
 
   // Booking status breakdown for pie chart — use correct title-case keys
@@ -132,48 +133,77 @@ const Dashboard = () => {
       </div>
 
       {/* Upcoming Bookings (next 7 days) */}
-      <Card className="border-border">
-        <CardHeader><CardTitle className="font-display text-base">Upcoming Bookings (Next 7 Days)</CardTitle></CardHeader>
-        <CardContent>
-          {bookings.length === 0 ? (
-            <p className="text-muted-foreground font-body text-sm">No bookings yet.</p>
-          ) : (() => {
-            const now = new Date();
-            const upcoming = [...bookings]
-              .filter(b => {
-                if (!b.date) return false;
-                const d = parseISO(b.date);
-                const diff = (d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
-                return diff >= 0 && diff <= 7 && b.status !== "Cancelled";
-              })
-              .sort((a, b) => (a.date ?? "").localeCompare(b.date ?? "") || (a.time ?? "").localeCompare(b.time ?? ""));
+      <div className="grid lg:grid-cols-2 gap-6">
+        <Card className="border-border">
+          <CardHeader><CardTitle className="font-display text-base">Upcoming Bookings (7 Days)</CardTitle></CardHeader>
+          <CardContent>
+            {bookings.length === 0 ? (
+              <p className="text-muted-foreground font-body text-sm py-4">No bookings yet.</p>
+            ) : (() => {
+              const now = new Date();
+              const upcoming = [...bookings]
+                .filter(b => {
+                  if (!b.date) return false;
+                  const d = parseISO(b.date);
+                  const diff = (d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+                  return diff >= 0 && diff <= 7 && b.status !== "Cancelled";
+                })
+                .sort((a, b) => (a.date ?? "").localeCompare(b.date ?? "") || (a.time ?? "").localeCompare(b.time ?? ""));
 
-            if (upcoming.length === 0) return (
-              <p className="text-muted-foreground font-body text-sm">No upcoming bookings in the next 7 days.</p>
-            );
+              if (upcoming.length === 0) return (
+                <p className="text-muted-foreground font-body text-sm py-4">No upcoming bookings in the next 7 days.</p>
+              );
 
-            return (
-              <div className="space-y-3 max-h-[300px] overflow-y-auto">
-                {upcoming.map(b => (
-                  <div key={b.id} className="flex items-center gap-3">
-                    <div className="w-20 text-xs font-body text-muted-foreground flex-shrink-0">
-                      {b.date ? format(parseISO(b.date), "EEE, MMM d") : "—"}
+              return (
+                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                  {upcoming.slice(0, 10).map(b => (
+                    <div key={b.id} className="flex items-center gap-3">
+                      <div className="w-16 text-[10px] font-body text-muted-foreground flex-shrink-0">
+                        {b.date ? format(parseISO(b.date), "EEE, MMM d") : "—"}
+                      </div>
+                      <div className="w-12 text-[10px] font-body text-muted-foreground flex-shrink-0">{b.time}</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-body text-sm font-medium text-foreground truncate">{b.customer_name}</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{serviceMap[b.service_id] ?? b.service_id}</p>
+                      </div>
                     </div>
-                    <div className="w-14 text-xs font-body text-muted-foreground flex-shrink-0">{b.time}</div>
+                  ))}
+                </div>
+              );
+            })()}
+          </CardContent>
+        </Card>
+
+        <Card className="border-border">
+          <CardHeader><CardTitle className="font-display text-base">Recent Product Orders</CardTitle></CardHeader>
+          <CardContent>
+            {orders.length === 0 ? (
+              <p className="text-muted-foreground font-body text-sm py-4">No orders yet.</p>
+            ) : (
+              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                {[...orders].slice(0, 10).map(order => (
+                  <div key={order.id} className="flex items-center gap-3">
+                    <div className="w-16 text-[10px] font-body text-muted-foreground flex-shrink-0">
+                      {format(new Date(order.createdAt), "MMM d")}
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-body text-sm font-medium text-foreground truncate">{b.customer_name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{serviceMap[b.service_id] ?? b.service_id}</p>
+                      <p className="font-body text-sm font-medium text-foreground truncate">{order.customer_name}</p>
+                      <p className="text-[10px] text-gold font-bold">{order.items.length} item{order.items.length !== 1 ? "s" : ""} · LKR {order.total.toLocaleString()}</p>
                     </div>
-                    <Badge variant="outline" className={cn("text-[10px] font-body flex-shrink-0", statusConfig[b.status])}>
-                      {b.status}
+                    <Badge variant="outline" className={cn("text-[10px] font-body flex-shrink-0", 
+                      order.status === "Pending" ? "bg-amber-500/10 text-amber-500" :
+                      order.status === "Delivered" ? "bg-emerald-500/10 text-emerald-500" :
+                      "bg-blue-500/10 text-blue-500"
+                    )}>
+                      {order.status}
                     </Badge>
                   </div>
                 ))}
               </div>
-            );
-          })()}
-        </CardContent>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

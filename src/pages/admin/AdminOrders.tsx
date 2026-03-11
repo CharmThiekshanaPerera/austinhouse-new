@@ -2,7 +2,7 @@ import { useState } from "react";
 import { 
   ShoppingBag, Search, Filter, Eye, Phone, MessageSquare, 
   CheckCircle2, Clock, XCircle, Trash2, MoreVertical, 
-  MapPin, User, Mail, Calendar, Package
+  MapPin, User, Mail, Calendar, Package, CreditCard
 } from "lucide-react";
 import { useData, Order } from "@/contexts/DataContext";
 import { format } from "date-fns";
