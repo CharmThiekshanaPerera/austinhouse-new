@@ -119,7 +119,9 @@ const AdminOrders = () => {
               <TableRow className="border-border bg-muted/10">
                 <TableHead className="font-body text-xs uppercase tracking-wider h-12">Order ID</TableHead>
                 <TableHead className="font-body text-xs uppercase tracking-wider h-12">Customer</TableHead>
+                <TableHead className="font-body text-xs uppercase tracking-wider h-12">Items</TableHead>
                 <TableHead className="font-body text-xs uppercase tracking-wider h-12">Total</TableHead>
+                <TableHead className="font-body text-xs uppercase tracking-wider h-12">Payment</TableHead>
                 <TableHead className="font-body text-xs uppercase tracking-wider h-12">Date</TableHead>
                 <TableHead className="font-body text-xs uppercase tracking-wider h-12">Status</TableHead>
                 <TableHead className="font-body text-xs uppercase tracking-wider h-12 text-right">Actions</TableHead>
@@ -141,11 +143,24 @@ const AdminOrders = () => {
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="font-body font-bold text-foreground">{order.customer_name}</span>
-                          <span className="text-[10px] text-muted-foreground">{order.customer_email}</span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            <MapPin size={10} className="text-gold" /> {order.city}
+                          </span>
                         </div>
                       </TableCell>
-                      <TableCell className="font-display font-bold">LKR {order.total.toLocaleString()}</TableCell>
-                      <TableCell className="text-muted-foreground text-xs">{format(new Date(order.createdAt), "MMM d, h:mm a")}</TableCell>
+                      <TableCell className="font-body">
+                        <Badge variant="secondary" className="text-[10px] font-bold">
+                          {order.items.reduce((acc, item) => acc + item.quantity, 0)} Items
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-display font-bold whitespace-nowrap">LKR {order.total.toLocaleString()}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <CreditCard size={12} className="text-gold" />
+                          {order.payment_method}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-xs whitespace-nowrap">{format(new Date(order.createdAt), "MMM d, h:mm a")}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className={cn("text-[10px] uppercase font-bold tracking-tighter", config.className)}>
                           <config.icon size={10} className="mr-1" />
@@ -254,11 +269,17 @@ const AdminOrders = () => {
                   <h4 className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-4">Items</h4>
                   <div className="flex-1 space-y-3 overflow-y-auto max-h-[160px] pr-2">
                     {selectedOrder.items.map((item, i) => (
-                      <div key={i} className="flex gap-3 text-xs">
-                        <span className="font-bold text-gold">{item.quantity}x</span>
+                      <div key={i} className="flex gap-4 p-2 rounded-lg hover:bg-muted/10 transition-colors">
+                        <div className="w-12 h-12 rounded bg-background border border-border overflow-hidden flex-shrink-0">
+                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-body font-bold truncate">{item.name}</p>
-                          <p className="text-muted-foreground">LKR {item.price.toLocaleString()}</p>
+                          <div className="flex justify-between items-start gap-2">
+                            <p className="font-body font-bold text-sm truncate">{item.name}</p>
+                            <span className="font-bold text-gold text-xs">x{item.quantity}</span>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">LKR {item.price.toLocaleString()} each</p>
+                          <p className="text-[10px] font-bold text-foreground mt-0.5">Subtotal: LKR {(item.price * item.quantity).toLocaleString()}</p>
                         </div>
                       </div>
                     ))}
