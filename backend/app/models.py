@@ -313,5 +313,44 @@ class SubscriberCreate(BaseModel):
 class SubscriberUpdate(BaseModel):
     active: bool
 
+
 class SubscriberOut(SubscriberBase):
     id: str
+
+
+# --- Order Models ---
+OrderStatus = Literal["Pending", "Processing", "Shipped", "Delivered", "Cancelled"]
+PaymentMethod = Literal["COD", "Card"]
+
+class OrderItem(BaseModel):
+    product_id: str
+    name: str
+    quantity: int = Field(ge=1)
+    price: int = Field(ge=0)
+    image: str
+
+class OrderBase(BaseModel):
+    items: List[OrderItem]
+    total: int
+    customer_name: str
+    customer_email: str
+    customer_phone: str
+    address: str
+    city: str
+    payment_method: PaymentMethod
+    status: OrderStatus = "Pending"
+
+class OrderCreate(OrderBase):
+    pass
+
+class OrderUpdate(BaseModel):
+    status: Optional[OrderStatus] = None
+    customer_name: Optional[str] = None
+    customer_email: Optional[str] = None
+    customer_phone: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+
+class OrderOut(OrderBase):
+    id: str
+    createdAt: str
