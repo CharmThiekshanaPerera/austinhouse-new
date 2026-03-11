@@ -29,7 +29,29 @@ const SpecializedProcedures = () => {
         <div className="min-h-screen bg-background font-body">
             <SEO
                 title="Specialized Procedures"
-                description="Clinical grade aesthetic procedures."
+                description="Clinical grade aesthetic procedures at Austin House. Advanced medical-grade treatments designed for profound skin transformation and specific concern correction."
+                keywords="specialized aesthetics colombo, clinical skin procedures sri lanka, medical grade beauty treatments, Austin House specialized care"
+                canonical="https://bright-living-clone.lovable.app/services/specialized"
+                breadcrumbs={[
+                    { name: "Home", url: "https://bright-living-clone.lovable.app/" },
+                    { name: "Services", url: "https://bright-living-clone.lovable.app/services" },
+                    { name: "Specialized Procedures", url: "https://bright-living-clone.lovable.app/services/specialized" },
+                ]}
+                jsonLd={pageServices.map(service => ({
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    name: service.title,
+                    description: service.description,
+                    provider: {
+                        "@type": "LocalBusiness",
+                        name: "Austin House Beauty & Spa"
+                    },
+                    offers: {
+                        "@type": "Offer",
+                        price: service.price.replace(/[^\d]/g, ""),
+                        priceCurrency: "LKR"
+                    }
+                }))}
             />
 
             <Navbar />

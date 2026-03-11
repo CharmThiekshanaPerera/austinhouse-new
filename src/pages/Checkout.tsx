@@ -113,7 +113,12 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen bg-background pt-32">
-      <SEO title="Checkout" />
+      <SEO 
+        title="Checkout" 
+        description="Complete your purchase at Austin House Beauty & Spa. Secure checkout for premium skincare aftercare products."
+        keywords="checkout, austin house, beauty products, skincare delivery"
+        canonical="https://bright-living-clone.lovable.app/checkout"
+      />
       <Navbar />
 
       <div className="container mx-auto px-4 lg:px-8 max-w-6xl pb-32">

@@ -31,7 +31,29 @@ const Facials = () => {
         <div className="min-h-screen bg-background font-body">
             <SEO
                 title="Luxury Facials"
-                description="Experience Colombo's finest luxury facials at Austin House Aesthetic Centre."
+                description="Experience Colombo's finest luxury facials at Austin House Aesthetic Centre. From deep purification to anti-aging infusions, we offer bespoke treatments for every skin type."
+                keywords="facials colombo, luxury skin care sri lanka, deep pore extraction, anti-aging facials, Austin House facial treatments"
+                canonical="https://bright-living-clone.lovable.app/services/facials"
+                breadcrumbs={[
+                    { name: "Home", url: "https://bright-living-clone.lovable.app/" },
+                    { name: "Services", url: "https://bright-living-clone.lovable.app/services" },
+                    { name: "Facials", url: "https://bright-living-clone.lovable.app/services/facials" },
+                ]}
+                jsonLd={pageServices.map(service => ({
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    name: service.title,
+                    description: service.description,
+                    provider: {
+                        "@type": "LocalBusiness",
+                        name: "Austin House Beauty & Spa"
+                    },
+                    offers: {
+                        "@type": "Offer",
+                        price: service.price.replace(/[^\d]/g, ""),
+                        priceCurrency: "LKR"
+                    }
+                }))}
             />
 
             <Navbar />

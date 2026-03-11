@@ -29,7 +29,29 @@ const WaxingTreatments = () => {
         <div className="min-h-screen bg-background font-body">
             <SEO
                 title="Waxing Treatments"
-                description="Painless, premium waxing treatments at Austin House."
+                description="Painless, premium waxing treatments at Austin House. Hygienic depilatory services using master-grade hard waxes for silky smooth skin."
+                keywords="waxing treatments colombo, premium waxing sri lanka, painless hair removal, hard wax services, Austin House waxing"
+                canonical="https://bright-living-clone.lovable.app/services/waxing"
+                breadcrumbs={[
+                    { name: "Home", url: "https://bright-living-clone.lovable.app/" },
+                    { name: "Services", url: "https://bright-living-clone.lovable.app/services" },
+                    { name: "Waxing", url: "https://bright-living-clone.lovable.app/services/waxing" },
+                ]}
+                jsonLd={pageServices.map(service => ({
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    name: service.title,
+                    description: service.description,
+                    provider: {
+                        "@type": "LocalBusiness",
+                        name: "Austin House Beauty & Spa"
+                    },
+                    offers: {
+                        "@type": "Offer",
+                        price: service.price.replace(/[^\d]/g, ""),
+                        priceCurrency: "LKR"
+                    }
+                }))}
             />
 
             <Navbar />

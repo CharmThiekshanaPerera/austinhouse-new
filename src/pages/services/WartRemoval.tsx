@@ -28,7 +28,29 @@ const WartRemoval = () => {
         <div className="min-h-screen bg-background font-body">
             <SEO
                 title="Wart & Skin Tag Removal"
-                description="Safe and effective laser wart and skin tag removal at Austin House."
+                description="Safe and effective laser wart and skin tag removal at Austin House. Fastest CO2 laser treatments for a clear and flawless complexion."
+                keywords="wart removal colombo, skin tag removal sri lanka, laser wart treatment, CO2 laser treatment, Austin House removal services"
+                canonical="https://bright-living-clone.lovable.app/services/wart-removal"
+                breadcrumbs={[
+                    { name: "Home", url: "https://bright-living-clone.lovable.app/" },
+                    { name: "Services", url: "https://bright-living-clone.lovable.app/services" },
+                    { name: "Wart Removal", url: "https://bright-living-clone.lovable.app/services/wart-removal" },
+                ]}
+                jsonLd={pageServices.map(service => ({
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    name: service.title,
+                    description: service.description,
+                    provider: {
+                        "@type": "LocalBusiness",
+                        name: "Austin House Beauty & Spa"
+                    },
+                    offers: {
+                        "@type": "Offer",
+                        price: service.price.replace(/[^\d]/g, ""),
+                        priceCurrency: "LKR"
+                    }
+                }))}
             />
 
             <Navbar />

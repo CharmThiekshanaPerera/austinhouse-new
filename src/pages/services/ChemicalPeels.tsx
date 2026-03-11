@@ -30,7 +30,29 @@ const ChemicalPeels = () => {
         <div className="min-h-screen bg-background font-body">
             <SEO
                 title="Chemical Peels - Face & Body"
-                description="Rejuvenate your skin with our premium fractional cell, sensitive medical, and body peels at Austin House Aesthetic Centre."
+                description="Rejuvenate your skin with our premium fractional cell, medical, and body peels at Austin House. Advanced medical-grade treatments for deep renewal and pigmentation correction."
+                keywords="chemical peels colombo, skin rejuvenation sri lanka, medical grade peels, body peeling treatments, Austin House chemical peels"
+                canonical="https://bright-living-clone.lovable.app/services/chemical-peels"
+                breadcrumbs={[
+                    { name: "Home", url: "https://bright-living-clone.lovable.app/" },
+                    { name: "Services", url: "https://bright-living-clone.lovable.app/services" },
+                    { name: "Chemical Peels", url: "https://bright-living-clone.lovable.app/services/chemical-peels" },
+                ]}
+                jsonLd={pageServices.map(service => ({
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    name: service.title,
+                    description: service.description,
+                    provider: {
+                        "@type": "LocalBusiness",
+                        name: "Austin House Beauty & Spa"
+                    },
+                    offers: {
+                        "@type": "Offer",
+                        price: service.price.replace(/[^\d]/g, ""),
+                        priceCurrency: "LKR"
+                    }
+                }))}
             />
 
             <Navbar />

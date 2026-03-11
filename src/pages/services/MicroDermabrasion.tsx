@@ -28,7 +28,29 @@ const MicroDermabrasion = () => {
         <div className="min-h-screen bg-background font-body">
             <SEO
                 title="Micro-Dermabrasion"
-                description="Premium skin resurfacing and exfoliation."
+                description="Premium skin resurfacing and exfoliation at Austin House. Reveal fresh, glowing, and youthful skin by removing dead surface cells with professional therapies."
+                keywords="microdermabrasion colombo, skin resurfacing sri lanka, medical grade exfoliation, glowing skin treatments, Austin House microdermabrasion"
+                canonical="https://bright-living-clone.lovable.app/services/microdermabrasion"
+                breadcrumbs={[
+                    { name: "Home", url: "https://bright-living-clone.lovable.app/" },
+                    { name: "Services", url: "https://bright-living-clone.lovable.app/services" },
+                    { name: "Micro-Dermabrasion", url: "https://bright-living-clone.lovable.app/services/microdermabrasion" },
+                ]}
+                jsonLd={pageServices.map(service => ({
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    name: service.title,
+                    description: service.description,
+                    provider: {
+                        "@type": "LocalBusiness",
+                        name: "Austin House Beauty & Spa"
+                    },
+                    offers: {
+                        "@type": "Offer",
+                        price: service.price.replace(/[^\d]/g, ""),
+                        priceCurrency: "LKR"
+                    }
+                }))}
             />
 
             <Navbar />

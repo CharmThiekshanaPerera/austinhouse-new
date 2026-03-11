@@ -28,7 +28,29 @@ const IntimateAreaServices = () => {
         <div className="min-h-screen bg-background font-body">
             <SEO
                 title="Intimate Area Services"
-                description="Discreet and professional intimate skin care and brightening treatments."
+                description="Discreet and professional intimate skin care and brightening treatments at Austin House. Specialized care in a private and comfortable setting."
+                keywords="intimate lightening colombo, delicate skin care sri lanka, private spa treatments, aesthetic intimate care, Austin House specialized services"
+                canonical="https://bright-living-clone.lovable.app/services/intimate"
+                breadcrumbs={[
+                    { name: "Home", url: "https://bright-living-clone.lovable.app/" },
+                    { name: "Services", url: "https://bright-living-clone.lovable.app/services" },
+                    { name: "Intimate Care", url: "https://bright-living-clone.lovable.app/services/intimate" },
+                ]}
+                jsonLd={pageServices.map(service => ({
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    name: service.title,
+                    description: service.description,
+                    provider: {
+                        "@type": "LocalBusiness",
+                        name: "Austin House Beauty & Spa"
+                    },
+                    offers: {
+                        "@type": "Offer",
+                        price: service.price.replace(/[^\d]/g, ""),
+                        priceCurrency: "LKR"
+                    }
+                }))}
             />
 
             <Navbar />

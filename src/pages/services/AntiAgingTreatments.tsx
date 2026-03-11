@@ -28,7 +28,29 @@ const AntiAgingTreatments = () => {
         <div className="min-h-screen bg-background font-body">
             <SEO
                 title="Anti-Aging Skin Tightening"
-                description="Turn back time with our advanced anti-aging and skin tightening treatments."
+                description="Turn back time with our advanced anti-aging and skin tightening treatments at Austin House. Non-surgical lifting and firming to restore your skin's natural elasticity."
+                keywords="anti-aging colombo, skin tightening sri lanka, non-surgical facelift, collagen induction, Austin House anti-aging"
+                canonical="https://bright-living-clone.lovable.app/services/anti-aging"
+                breadcrumbs={[
+                    { name: "Home", url: "https://bright-living-clone.lovable.app/" },
+                    { name: "Services", url: "https://bright-living-clone.lovable.app/services" },
+                    { name: "Anti-Aging", url: "https://bright-living-clone.lovable.app/services/anti-aging" },
+                ]}
+                jsonLd={pageServices.map(service => ({
+                    "@context": "https://schema.org",
+                    "@type": "Service",
+                    name: service.title,
+                    description: service.description,
+                    provider: {
+                        "@type": "LocalBusiness",
+                        name: "Austin House Beauty & Spa"
+                    },
+                    offers: {
+                        "@type": "Offer",
+                        price: service.price.replace(/[^\d]/g, ""),
+                        priceCurrency: "LKR"
+                    }
+                }))}
             />
 
             <Navbar />

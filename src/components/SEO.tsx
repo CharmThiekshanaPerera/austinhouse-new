@@ -6,11 +6,12 @@ interface SEOProps {
   ogImage?: string;
   ogType?: string;
   canonical?: string;
-  jsonLd?: Record<string, unknown>;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   breadcrumbs?: { name: string; url: string }[];
+  keywords?: string;
 }
 
-const SEO = ({ title, description, ogImage, ogType = "website", canonical, jsonLd, breadcrumbs }: SEOProps) => {
+const SEO = ({ title, description, ogImage, ogType = "website", canonical, jsonLd, breadcrumbs, keywords }: SEOProps) => {
   useEffect(() => {
     const fullTitle = `${title} | Austin House Beauty & Spa`;
     document.title = fullTitle;
@@ -26,32 +27,43 @@ const SEO = ({ title, description, ogImage, ogType = "website", canonical, jsonL
     };
 
     setMeta("description", description);
+    if (keywords) setMeta("keywords", keywords);
+    
     setMeta("og:title", fullTitle, "property");
     setMeta("og:description", description, "property");
     setMeta("og:type", ogType, "property");
     if (ogImage) setMeta("og:image", ogImage, "property");
+    
     if (canonical) {
       let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-      if (!link) { link = document.createElement("link"); link.rel = "canonical"; document.head.appendChild(link); }
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "canonical";
+        document.head.appendChild(link);
+      }
       link.href = canonical;
     }
+
     setMeta("twitter:card", ogImage ? "summary_large_image" : "summary", "name");
     setMeta("twitter:title", fullTitle, "name");
     setMeta("twitter:description", description, "name");
     if (ogImage) setMeta("twitter:image", ogImage, "name");
 
+    // Clean up old JSON-LD scripts
+    const oldScripts = document.querySelectorAll('script[data-seo-jsonld]');
+    oldScripts.forEach(s => s.remove());
+
     // JSON-LD structured data
-    let scriptEl = document.querySelector('script[data-seo-jsonld]') as HTMLScriptElement | null;
     if (jsonLd) {
-      if (!scriptEl) {
-        scriptEl = document.createElement("script");
+      const schemas = Array.isArray(jsonLd) ? jsonLd : [jsonLd];
+      schemas.forEach((schema, index) => {
+        const scriptEl = document.createElement("script");
         scriptEl.setAttribute("type", "application/ld+json");
         scriptEl.setAttribute("data-seo-jsonld", "true");
+        scriptEl.setAttribute("data-schema-index", index.toString());
+        scriptEl.textContent = JSON.stringify(schema);
         document.head.appendChild(scriptEl);
-      }
-      scriptEl.textContent = JSON.stringify(jsonLd);
-    } else if (scriptEl) {
-      scriptEl.remove();
+      });
     }
 
     // Breadcrumb JSON-LD
@@ -78,13 +90,14 @@ const SEO = ({ title, description, ogImage, ogType = "website", canonical, jsonL
     }
 
     return () => {
-      document.title = "Austin House Beauty & Spa";
-      const ldScript = document.querySelector('script[data-seo-jsonld]');
-      if (ldScript) ldScript.remove();
+      // We don't necessarily want to reset everything on unmount if another page is mounting
+      // but we should clean up the JSON-LD at least
+      const scripts = document.querySelectorAll('script[data-seo-jsonld]');
+      scripts.forEach(s => s.remove());
       const bcScript = document.querySelector('script[data-seo-breadcrumb]');
       if (bcScript) bcScript.remove();
     };
-  }, [title, description, ogImage, ogType, canonical, jsonLd, breadcrumbs]);
+  }, [title, description, ogImage, ogType, canonical, jsonLd, breadcrumbs, keywords]);
 
   return null;
 };
