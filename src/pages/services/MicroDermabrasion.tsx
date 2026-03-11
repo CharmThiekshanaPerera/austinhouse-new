@@ -1,12 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import CTABanner from "@/components/CTABanner";
 import SEO from "@/components/SEO";
+import OtherServices from "@/components/OtherServices";
 import { Link } from "react-router-dom";
-import { Clock, Info } from "lucide-react";
+import { Clock, Info, ArrowRight } from "lucide-react";
+import ServiceModal, { ServiceData } from "@/components/ServiceModal";
 
 const servicesData = [
     {
@@ -15,6 +17,7 @@ const servicesData = [
         duration: "1 hr",
         price: "15,000.00/=",
         description: "An exceptional exfoliating treatment using a diamond-tipped wand to gently sand away the thick outer layer of the skin. Rejuvenates sun-damaged skin, reduces acne scars, and evens out skin tone.",
+        image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80"
     },
     {
         id: "crystal-micro",
@@ -22,10 +25,14 @@ const servicesData = [
         duration: "1 hr",
         price: "12,000.00/=",
         description: "Utilizes ultra-fine crystals to blast away dead skin cells. Excellent for deep exfoliation, unclogging pores, and preparing the skin for maximum serum absorption.",
+        image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80"
     }
 ];
 
 const MicroDermabrasion = () => {
+    const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -70,6 +77,15 @@ const MicroDermabrasion = () => {
 
             <section className="py-20 lg:py-32 bg-background relative overflow-hidden">
                 <div className="container mx-auto px-4 lg:px-8 max-w-5xl relative z-10">
+                    <div className="mb-16 text-center">
+                        <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+                            Our Micro-Dermabrasion <span className="text-gold-gradient">Options</span>
+                        </h2>
+                        <p className="text-muted-foreground max-w-2xl mx-auto">
+                            Resurface and renew your complexion with our professional micro-dermabrasion therapies tailored to your skin type.
+                        </p>
+                    </div>
+
                     <div className="space-y-12">
                         {servicesData.map((service, index) => (
                             <motion.div
@@ -90,6 +106,15 @@ const MicroDermabrasion = () => {
                                         <p className="text-muted-foreground text-[15px] leading-relaxed mb-6">
                                             {service.description}
                                         </p>
+                                        <button 
+                                            onClick={() => {
+                                                setSelectedService(service);
+                                                setIsModalOpen(true);
+                                            }}
+                                            className="text-primary font-bold text-sm hover:text-gold flex items-center gap-1 transition-colors uppercase tracking-wider"
+                                        >
+                                            Read More <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                        </button>
                                     </div>
 
                                     <div className="w-full md:w-[320px] shrink-0 border-t md:border-t-0 md:border-l border-border pt-6 md:pt-0 md:pl-10 flex flex-col justify-center">
@@ -165,9 +190,16 @@ const MicroDermabrasion = () => {
         </div>
       </section>
 
+      <OtherServices currentPath="/services/micro-dermabrasion" />
       <CTABanner />
             <Footer />
             <WhatsAppButton />
+
+            <ServiceModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                service={selectedService}
+            />
         </div>
     );
 };

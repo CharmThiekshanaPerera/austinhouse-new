@@ -1,12 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import CTABanner from "@/components/CTABanner";
 import SEO from "@/components/SEO";
+import OtherServices from "@/components/OtherServices";
 import { Link } from "react-router-dom";
-import { Clock, Info } from "lucide-react";
+import { Clock, Info, ArrowRight } from "lucide-react";
+import ServiceModal, { ServiceData } from "@/components/ServiceModal";
 
 const servicesData = [
     {
@@ -15,6 +17,7 @@ const servicesData = [
         duration: "1 hr",
         price: "18,000.00/=",
         description: "A specialized, gentle treatment designed to safely reduce hyperpigmentation in delicate areas. Uses medical-grade brightening serums and mild exfoliants for an even skin tone.",
+        image: "https://images.unsplash.com/photo-1552693673-1bf958298935?auto=format&fit=crop&q=80"
     },
     {
         id: "bikini-facial",
@@ -22,10 +25,14 @@ const servicesData = [
         duration: "45 mins",
         price: "12,000.00/=",
         description: "Perfect for post-wax care. This soothing treatment cleanses, gently exfoliates, extracts ingrown hairs, and deeply moisturizes the bikini line for flawless, bump-free skin.",
+        image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80"
     }
 ];
 
 const IntimateAreaServices = () => {
+    const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -70,6 +77,15 @@ const IntimateAreaServices = () => {
 
             <section className="py-20 lg:py-32 bg-background relative overflow-hidden">
                 <div className="container mx-auto px-4 lg:px-8 max-w-5xl relative z-10">
+                    <div className="mb-16 text-center">
+                        <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+                            Our Intimate Care <span className="text-gold-gradient">Collection</span>
+                        </h2>
+                        <p className="text-muted-foreground max-w-2xl mx-auto">
+                            Safe, gentle, and specialized treatments designed specifically for your most delicate areas in a completely private setting.
+                        </p>
+                    </div>
+
                     <div className="space-y-12">
                         {servicesData.map((service, index) => (
                             <motion.div
@@ -90,6 +106,15 @@ const IntimateAreaServices = () => {
                                         <p className="text-muted-foreground text-[15px] leading-relaxed mb-6">
                                             {service.description}
                                         </p>
+                                        <button 
+                                            onClick={() => {
+                                                setSelectedService(service);
+                                                setIsModalOpen(true);
+                                            }}
+                                            className="text-primary font-bold text-sm hover:text-gold flex items-center gap-1 transition-colors uppercase tracking-wider"
+                                        >
+                                            Read More <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                        </button>
                                     </div>
 
                                     <div className="w-full md:w-[320px] shrink-0 border-t md:border-t-0 md:border-l border-border pt-6 md:pt-0 md:pl-10 flex flex-col justify-center">
@@ -165,9 +190,16 @@ const IntimateAreaServices = () => {
         </div>
       </section>
 
+      <OtherServices currentPath="/services/intimate" />
       <CTABanner />
             <Footer />
             <WhatsAppButton />
+
+            <ServiceModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                service={selectedService}
+            />
         </div>
     );
 };

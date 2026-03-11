@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -8,6 +8,8 @@ import SEO from "@/components/SEO";
 import { Link } from "react-router-dom";
 import { ArrowRight, Clock, Info } from "lucide-react";
 import LazyImage from "@/components/LazyImage";
+import OtherServices from "@/components/OtherServices";
+import ServiceModal, { ServiceData } from "@/components/ServiceModal";
 
 const servicesData = [
     {
@@ -16,6 +18,7 @@ const servicesData = [
         duration: "1 - 2 hrs",
         price: "From 15,000.00/=",
         description: "Achieve permanent hair reduction using advanced diode laser technology. Safe for all skin types, our laser treatments effectively target hair follicles to prevent future growth, ensuring long-lasting smooth skin.",
+        image: "https://images.unsplash.com/photo-1512290746430-3ffb4fab31bc?auto=format&fit=crop&q=80"
     },
     {
         id: "prp-therapy",
@@ -23,6 +26,7 @@ const servicesData = [
         duration: "1.5 hrs",
         price: "45,000.00/=",
         description: "Platelet-Rich Plasma therapy uses your body's own growth factors to stimulate collagen production. Excellent for acne scarring, overall skin rejuvenation, and restoring a youthful glow.",
+        image: "https://images.unsplash.com/photo-1519014816548-bf5fe059e98b?auto=format&fit=crop&q=80"
     },
     {
         id: "microneedling",
@@ -30,10 +34,14 @@ const servicesData = [
         duration: "1 hr",
         price: "22,000.00/=",
         description: "A minimally invasive procedure that creates micro-punctures in the skin to trigger collagen and elastin synthesis. Highly effective for texture improvement and pore size reduction.",
+        image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80"
     }
 ];
 
 const SpecializedProcedures = () => {
+    const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -78,6 +86,15 @@ const SpecializedProcedures = () => {
 
             <section className="py-20 lg:py-32 bg-background relative overflow-hidden">
                 <div className="container mx-auto px-4 lg:px-8 max-w-5xl relative z-10">
+                    <div className="mb-16 text-center">
+                        <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+                            Our Specialized <span className="text-gold-gradient">Procedures</span>
+                        </h2>
+                        <p className="text-muted-foreground max-w-2xl mx-auto">
+                            Discover our advanced aesthetic procedures tailored to address specific skin concerns with expert precision.
+                        </p>
+                    </div>
+
                     <div className="space-y-12">
                         {servicesData.map((service, index) => (
                             <motion.div
@@ -98,6 +115,15 @@ const SpecializedProcedures = () => {
                                         <p className="text-muted-foreground text-[15px] leading-relaxed mb-6">
                                             {service.description}
                                         </p>
+                                        <button 
+                                            onClick={() => {
+                                                setSelectedService(service);
+                                                setIsModalOpen(true);
+                                            }}
+                                            className="text-primary font-bold text-sm hover:text-gold flex items-center gap-1 transition-colors uppercase tracking-wider"
+                                        >
+                                            Read More <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                        </button>
                                     </div>
 
                                     <div className="w-full md:w-[320px] shrink-0 border-t md:border-t-0 md:border-l border-border pt-6 md:pt-0 md:pl-10 flex flex-col justify-center">
@@ -173,9 +199,16 @@ const SpecializedProcedures = () => {
         </div>
       </section>
 
+      <OtherServices currentPath="/services/specialized" />
       <CTABanner />
             <Footer />
             <WhatsAppButton />
+
+            <ServiceModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                service={selectedService}
+            />
         </div>
     );
 };

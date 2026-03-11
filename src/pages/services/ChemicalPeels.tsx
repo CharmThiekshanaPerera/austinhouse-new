@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -8,6 +8,8 @@ import SEO from "@/components/SEO";
 import { Link } from "react-router-dom";
 import { ArrowRight, Clock, Info } from "lucide-react";
 import LazyImage from "@/components/LazyImage";
+import OtherServices from "@/components/OtherServices";
+import ServiceModal, { ServiceData } from "@/components/ServiceModal";
 
 const peelsData = [
     {
@@ -16,6 +18,7 @@ const peelsData = [
         duration: "2.5 hrs",
         price: "35,000.00/=",
         description: "Revitalize your skin with our exclusive Fractional Cellular Repair (FCR) by activating the innate immune system and promoting blood circulation. This advanced treatment combines cutting-edge technology with natural extracts to promote deep skin renewal, reduces acne and acne scars, reduce fine lines, and restore youthful radiance.",
+        image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80"
     },
     {
         id: "sensitive",
@@ -23,6 +26,7 @@ const peelsData = [
         duration: "1 hr",
         price: "25,000.00/=",
         description: "FOXC peel is an all-in-one premium skin healing program with fruit fermented acid, oxygen therapy, vitamin c, and polyphenol. This advanced treatment combines the power of exfoliation with antioxidant-rich formulas to unveil a smoother, more youthful complexion. Perfect for reducing fine lines, acne scars, unwanted hyper-pigmentation and wrinkles.",
+        image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80"
     },
     {
         id: "saree",
@@ -30,6 +34,7 @@ const peelsData = [
         duration: "1 hr",
         price: "15,000.00/=",
         description: "Enhance the beauty of the elegant saree you wear, by having your saree jacket line treated with us before your big day. Indulge in our rejuvenating body peel, tailored like the elegance of a meticulously crafted saree jacket.",
+        image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&q=80"
     },
     {
         id: "back",
@@ -37,6 +42,7 @@ const peelsData = [
         duration: "1.5 hrs",
         price: "20,000.00/=",
         description: "From neck to waist, let us treat you, to have the most soft and beautiful skin you always wanted, to wear that backless dress you dreamt about. Revitalize your skin with our rejuvenating full back peel.",
+        image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80"
     },
     {
         id: "booty",
@@ -44,6 +50,7 @@ const peelsData = [
         duration: "1 hr",
         price: "30,000.00/=",
         description: "Begin your journey to a flawless booty with foxcpeel. Rejuvenate your skin with our premium ingredients packed with antioxidants and treat your booty to the care it truly deserves!",
+        image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80"
     },
     {
         id: "vagi",
@@ -51,10 +58,14 @@ const peelsData = [
         duration: "1.5 hrs",
         price: "20,000.00/=",
         description: "A gentle, yet effective peel designed to improve the texture and appearance of the intimate skin area. This treatment with its antioxidant rich formulas will help to exfoliate, brighten and unveil smoother skin. Especially designed for brightening darker vaginal areas, where you have the freedom to add on to include inside thighs if you wish for a full experience.",
+        image: "https://images.unsplash.com/photo-1552693673-1bf958298935?auto=format&fit=crop&q=80"
     }
 ];
 
 const ChemicalPeels = () => {
+    const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     // Scroll to top on mount
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -74,10 +85,11 @@ const ChemicalPeels = () => {
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-charcoal/70 z-10" />
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-20" />
-                    <video autoPlay loop muted playsInline className="w-full h-full object-cover">
-                        {/* Elegant placeholder video */}
-                        <source src="https://player.vimeo.com/external/498305001.sd.mp4?s=d0db586c91350a8ceca9fd8ebd598ff7b7bbcb17&profile_id=164&oauth2_token_id=57447761" type="video/mp4" />
-                    </video>
+                    <img
+                        src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80"
+                        alt="Chemical Peels"
+                        className="w-full h-full object-cover"
+                    />
                 </div>
 
                 <motion.div
@@ -138,7 +150,13 @@ const ChemicalPeels = () => {
                                         <p className="text-muted-foreground text-[15px] leading-relaxed mb-6">
                                             {peel.description}
                                         </p>
-                                        <button className="text-primary font-bold text-sm hover:text-gold flex items-center gap-1 transition-colors uppercase tracking-wider">
+                                        <button 
+                                            onClick={() => {
+                                                setSelectedService(peel);
+                                                setIsModalOpen(true);
+                                            }}
+                                            className="text-primary font-bold text-sm hover:text-gold flex items-center gap-1 transition-colors uppercase tracking-wider"
+                                        >
                                             Read More <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                                         </button>
                                     </div>
@@ -218,9 +236,16 @@ const ChemicalPeels = () => {
         </div>
       </section>
 
-            <CTABanner />
+      <OtherServices currentPath="/services/chemical-peels" />
+      <CTABanner />
             <Footer />
             <WhatsAppButton />
+
+            <ServiceModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                service={selectedService}
+            />
         </div>
     );
 };

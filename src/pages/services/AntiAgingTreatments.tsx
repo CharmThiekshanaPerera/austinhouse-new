@@ -1,12 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import CTABanner from "@/components/CTABanner";
 import SEO from "@/components/SEO";
+import OtherServices from "@/components/OtherServices";
 import { Link } from "react-router-dom";
-import { Clock, Info } from "lucide-react";
+import { Clock, Info, ArrowRight } from "lucide-react";
+import ServiceModal, { ServiceData } from "@/components/ServiceModal";
 
 const servicesData = [
     {
@@ -15,6 +17,7 @@ const servicesData = [
         duration: "2 hrs",
         price: "45,000.00/=",
         description: "High-Intensity Focused Ultrasound (HIFU) delivers focused energy to the deep structural layers of the skin, stimulating collagen production for a non-surgical facelift effect.",
+        image: "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&q=80"
     },
     {
         id: "rf-tightening",
@@ -22,6 +25,7 @@ const servicesData = [
         duration: "1 hr",
         price: "20,000.00/=",
         description: "Radiofrequency treatments heat the dermal layers to immediately tighten existing collagen fibers and promote new collagen growth, reducing sagging and fine lines.",
+        image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80"
     },
     {
         id: "thermage",
@@ -29,10 +33,14 @@ const servicesData = [
         duration: "1.5 hrs",
         price: "75,000.00/=",
         description: "The gold standard in non-invasive skin tightening. A single treatment provides immediate smoothing with results that continue to improve over six months.",
+        image: "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&q=80"
     }
 ];
 
 const AntiAgingTreatments = () => {
+    const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -79,6 +87,15 @@ const AntiAgingTreatments = () => {
                 <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gold/5 blur-[100px] rounded-full pointer-events-none" />
 
                 <div className="container mx-auto px-4 lg:px-8 max-w-5xl relative z-10">
+                    <div className="mb-16 text-center">
+                        <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+                            Our Anti-Aging <span className="text-gold-gradient">Solutions</span>
+                        </h2>
+                        <p className="text-muted-foreground max-w-2xl mx-auto">
+                            Turn back time with our curated selection of skin tightening and age-defying treatments designed to restore your youthful glow.
+                        </p>
+                    </div>
+
                     <div className="space-y-12">
                         {servicesData.map((service, index) => (
                             <motion.div
@@ -99,6 +116,15 @@ const AntiAgingTreatments = () => {
                                         <p className="text-muted-foreground text-[15px] leading-relaxed mb-6">
                                             {service.description}
                                         </p>
+                                        <button 
+                                            onClick={() => {
+                                                setSelectedService(service);
+                                                setIsModalOpen(true);
+                                            }}
+                                            className="text-primary font-bold text-sm hover:text-gold flex items-center gap-1 transition-colors uppercase tracking-wider"
+                                        >
+                                            Read More <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                        </button>
                                     </div>
 
                                     <div className="w-full md:w-[320px] shrink-0 border-t md:border-t-0 md:border-l border-border pt-6 md:pt-0 md:pl-10 flex flex-col justify-center">
@@ -174,9 +200,16 @@ const AntiAgingTreatments = () => {
         </div>
       </section>
 
-            <CTABanner />
+      <OtherServices currentPath="/services/anti-aging" />
+      <CTABanner />
             <Footer />
             <WhatsAppButton />
+
+            <ServiceModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                service={selectedService}
+            />
         </div>
     );
 };

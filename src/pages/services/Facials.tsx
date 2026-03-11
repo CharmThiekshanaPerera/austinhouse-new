@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -8,6 +8,8 @@ import SEO from "@/components/SEO";
 import { Link } from "react-router-dom";
 import { ArrowRight, Clock, Info } from "lucide-react";
 import LazyImage from "@/components/LazyImage";
+import OtherServices from "@/components/OtherServices";
+import ServiceModal, { ServiceData } from "@/components/ServiceModal";
 
 const servicesData = [
     {
@@ -16,6 +18,7 @@ const servicesData = [
         duration: "1.5 hrs",
         price: "15,000.00/=",
         description: "Experience the ultimate luxury with our 24K Signature Gold Facial. Designed to illuminate your complexion, reduce fine lines, and deeply nourish the skin using pure gold extracts and advanced serums.",
+        image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80"
     },
     {
         id: "deep-cleanse",
@@ -23,6 +26,7 @@ const servicesData = [
         duration: "1 hr",
         price: "12,000.00/=",
         description: "A targeted treatment for blemish-prone skin. Includes rigorous extraction, high-frequency therapy to eliminate acne-causing bacteria, and a soothing mask to reduce inflammation.",
+        image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80"
     },
     {
         id: "hydra-facial",
@@ -30,10 +34,14 @@ const servicesData = [
         duration: "1.5 hrs",
         price: "18,000.00/=",
         description: "Instantly plump and hydrate your skin with our multi-step hydra therapy. Uses vortex-fusion technology to cleanse, extract, and intensely hydrate for an undeniable post-facial glow.",
+        image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80"
     }
 ];
 
 const Facials = () => {
+    const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -84,10 +92,10 @@ const Facials = () => {
                 <div className="container mx-auto px-4 lg:px-8 max-w-5xl relative z-10">
                     <div className="mb-16 text-center">
                         <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-                            Our <span className="text-gold-gradient">Collection</span>
+                            Our Facial <span className="text-gold-gradient">Collection</span>
                         </h2>
                         <p className="text-muted-foreground max-w-2xl mx-auto">
-                            Elevate your skincare routine with our master-crafted facial treatments.
+                            Elevate your skincare routine with our master-crafted luxury facial treatments designed for ultimate radiance and comprehensive skin health.
                         </p>
                     </div>
 
@@ -111,7 +119,13 @@ const Facials = () => {
                                         <p className="text-muted-foreground text-[15px] leading-relaxed mb-6">
                                             {service.description}
                                         </p>
-                                        <button className="text-primary font-bold text-sm hover:text-gold flex items-center gap-1 transition-colors uppercase tracking-wider">
+                                        <button 
+                                            onClick={() => {
+                                                setSelectedService(service);
+                                                setIsModalOpen(true);
+                                            }}
+                                            className="text-primary font-bold text-sm hover:text-gold flex items-center gap-1 transition-colors uppercase tracking-wider"
+                                        >
                                             Read More <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                                         </button>
                                     </div>
@@ -190,9 +204,16 @@ const Facials = () => {
         </div>
       </section>
 
-            <CTABanner />
+      <OtherServices currentPath="/services/facials" />
+      <CTABanner />
             <Footer />
             <WhatsAppButton />
+
+            <ServiceModal 
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                service={selectedService}
+            />
         </div>
     );
 };

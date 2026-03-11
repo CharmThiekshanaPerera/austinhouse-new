@@ -77,9 +77,9 @@ const Index = () => {
       <TeamSection />
       <RevolutionSection />
       <ResultsShowcase />
-      <MembershipSection />
       <InstagramWall />
       <TestimonialsSection />
+      <MembershipSection />
       <CTABanner />
       <FAQSection />
       <Footer />
