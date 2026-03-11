@@ -1,17 +1,28 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Search, Instagram, Facebook } from "lucide-react";
+import { Menu, X, Search, Instagram, Facebook, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
-  { label: "Services", href: "/services" },
+  { label: "Services", href: "/services", hasDropdown: true },
   { label: "Products", href: "/products" },
   { label: "Gallery", href: "/gallery" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
+];
+
+const servicesMenu = [
+  { label: "Facials", href: "/services/facials" },
+  { label: "Chemical Peels", href: "/services/chemical-peels" },
+  { label: "Waxing Treatments", href: "/services/waxing" },
+  { label: "Specialized Procedures", href: "/services/specialized" },
+  { label: "Anti-aging Skin Tightening Treatments", href: "/services/anti-aging" },
+  { label: "Intimate Area Services", href: "/services/intimate" },
+  { label: "Wart Removal", href: "/services/wart-removal" },
+  { label: "Micro-Dermabrasion", href: "/services/micro-dermabrasion" },
 ];
 
 const Navbar = () => {
@@ -58,13 +69,31 @@ const Navbar = () => {
 
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                to={link.href}
-                className="text-cream/80 hover:text-gold transition-colors text-sm tracking-wider uppercase font-body"
-              >
-                {link.label}
-              </Link>
+              <div key={link.label} className="relative group">
+                <Link
+                  to={link.href}
+                  className="flex items-center gap-1 text-cream/80 hover:text-gold transition-colors text-sm tracking-wider uppercase font-body py-2"
+                >
+                  {link.label}
+                  {link.hasDropdown && <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-300" />}
+                </Link>
+
+                {link.hasDropdown && (
+                  <div className="absolute top-full -left-4 pt-2 hidden group-hover:block w-72">
+                    <div className="bg-[#002B4B] rounded-md shadow-2xl py-3 overflow-hidden border border-gold/10">
+                      {servicesMenu.map((item) => (
+                        <Link
+                          key={item.label}
+                          to={item.href}
+                          className="block px-6 py-2.5 text-[15px] font-body text-white hover:bg-gold/10 hover:text-gold-light transition-colors"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
             <button className="text-cream/60 hover:text-gold transition-colors" aria-label="Search">
               <Search size={18} />
@@ -91,14 +120,29 @@ const Navbar = () => {
           >
             <div className="px-4 py-6 flex flex-col gap-4">
               {navLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  to={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="text-cream/80 hover:text-gold transition-colors text-base tracking-wider uppercase font-body py-2 border-b border-gold/10"
-                >
-                  {link.label}
-                </Link>
+                <div key={link.label} className="flex flex-col">
+                  <Link
+                    to={link.href}
+                    onClick={() => !link.hasDropdown && setIsOpen(false)}
+                    className="flex justify-between items-center text-cream/80 hover:text-gold transition-colors text-base tracking-wider uppercase font-body py-2 border-b border-gold/10"
+                  >
+                    {link.label}
+                  </Link>
+                  {link.hasDropdown && (
+                    <div className="flex flex-col pl-4 mt-2 border-l-2 border-gold/20 space-y-2">
+                      {servicesMenu.map((item) => (
+                        <Link
+                          key={item.label}
+                          to={item.href}
+                          onClick={() => setIsOpen(false)}
+                          className="text-cream/70 hover:text-gold transition-colors text-sm font-body py-1.5"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
               <div className="flex items-center gap-4 pt-2">
                 <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-gold-light transition-colors" aria-label="Instagram">

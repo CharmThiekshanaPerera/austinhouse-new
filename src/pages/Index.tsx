@@ -15,6 +15,10 @@ import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import SEO from "@/components/SEO";
+import StatsSection from "@/components/StatsSection";
+import TeamSection from "@/components/TeamSection";
+import VideoParallaxSection from "@/components/VideoParallaxSection";
+import InstagramWall from "@/components/InstagramWall";
 
 const Index = () => {
   const { hash } = useLocation();
@@ -64,13 +68,17 @@ const Index = () => {
       />
       <HeroSection />
       <BrandSlider />
+      <VideoParallaxSection />
       <AboutSection />
+      <StatsSection />
       <ServicesSection />
       <SlideshowSection />
       <ProcessSection />
+      <TeamSection />
       <RevolutionSection />
       <ResultsShowcase />
       <MembershipSection />
+      <InstagramWall />
       <TestimonialsSection />
       <CTABanner />
       <FAQSection />

@@ -1,0 +1,200 @@
+import { useEffect } from "react";
+import { motion } from "framer-motion";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import WhatsAppButton from "@/components/WhatsAppButton";
+import CTABanner from "@/components/CTABanner";
+import SEO from "@/components/SEO";
+import { Link } from "react-router-dom";
+import { ArrowRight, Clock, Info } from "lucide-react";
+import LazyImage from "@/components/LazyImage";
+
+const servicesData = [
+    {
+        id: "signature-facial",
+        title: "Signature Gold Facial",
+        duration: "1.5 hrs",
+        price: "15,000.00/=",
+        description: "Experience the ultimate luxury with our 24K Signature Gold Facial. Designed to illuminate your complexion, reduce fine lines, and deeply nourish the skin using pure gold extracts and advanced serums.",
+    },
+    {
+        id: "deep-cleanse",
+        title: "Deep Cleansing Acne Facial",
+        duration: "1 hr",
+        price: "12,000.00/=",
+        description: "A targeted treatment for blemish-prone skin. Includes rigorous extraction, high-frequency therapy to eliminate acne-causing bacteria, and a soothing mask to reduce inflammation.",
+    },
+    {
+        id: "hydra-facial",
+        title: "Hydra-Glow Therapy",
+        duration: "1.5 hrs",
+        price: "18,000.00/=",
+        description: "Instantly plump and hydrate your skin with our multi-step hydra therapy. Uses vortex-fusion technology to cleanse, extract, and intensely hydrate for an undeniable post-facial glow.",
+    }
+];
+
+const Facials = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
+    return (
+        <div className="min-h-screen bg-background font-body">
+            <SEO
+                title="Luxury Facials"
+                description="Experience Colombo's finest luxury facials at Austin House Aesthetic Centre."
+            />
+
+            <Navbar />
+
+            {/* Hero Video Section */}
+            <section className="relative h-[60vh] min-h-[500px] w-full flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute inset-0 bg-charcoal/60 z-10" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-20" />
+                    <img
+                        src="https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80"
+                        alt="Facial Treatment"
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="relative z-30 container mx-auto px-4 text-center mt-20"
+                >
+                    <span className="text-gold tracking-[0.3em] uppercase text-sm font-semibold mb-4 block">
+                        Signature Care
+                    </span>
+                    <h1 className="font-display text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+                        Luxury Facials
+                    </h1>
+                    <p className="text-white/80 font-light text-lg max-w-2xl mx-auto">
+                        Bespoke treatments tailored to your unique skin profile for a radiant, flawless complexion.
+                    </p>
+                </motion.div>
+            </section>
+
+            {/* Services Listing Section */}
+            <section className="py-20 lg:py-32 bg-background relative overflow-hidden">
+                <div className="absolute top-40 right-0 w-[600px] h-[600px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+
+                <div className="container mx-auto px-4 lg:px-8 max-w-5xl relative z-10">
+                    <div className="mb-16 text-center">
+                        <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+                            Our <span className="text-gold-gradient">Collection</span>
+                        </h2>
+                        <p className="text-muted-foreground max-w-2xl mx-auto">
+                            Elevate your skincare routine with our master-crafted facial treatments.
+                        </p>
+                    </div>
+
+                    <div className="space-y-12">
+                        {servicesData.map((service, index) => (
+                            <motion.div
+                                key={service.id}
+                                initial={{ opacity: 0, y: 40 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-100px" }}
+                                transition={{ duration: 0.6, delay: index * 0.1 }}
+                                className="group relative bg-white border border-border/60 hover:border-gold/30 rounded-2xl p-6 md:p-10 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                                <div className="relative z-10 flex flex-col md:flex-row md:items-start gap-6 md:gap-10">
+                                    <div className="flex-1">
+                                        <h3 className="font-display text-2xl text-[#002B4B] font-bold mb-3 group-hover:text-primary transition-colors">
+                                            {service.title}
+                                        </h3>
+                                        <p className="text-muted-foreground text-[15px] leading-relaxed mb-6">
+                                            {service.description}
+                                        </p>
+                                        <button className="text-primary font-bold text-sm hover:text-gold flex items-center gap-1 transition-colors uppercase tracking-wider">
+                                            Read More <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                                        </button>
+                                    </div>
+
+                                    <div className="w-full md:w-[320px] shrink-0 border-t md:border-t-0 md:border-l border-border pt-6 md:pt-0 md:pl-10 flex flex-col justify-center">
+                                        <div className="flex items-center gap-6 mb-6">
+                                            <div>
+                                                <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Duration</p>
+                                                <div className="flex items-center gap-1.5 text-foreground font-medium">
+                                                    <Clock size={16} className="text-gold" />
+                                                    <span>{service.duration}</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-px h-10 bg-border" />
+                                            <div>
+                                                <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Investment</p>
+                                                <p className="text-lg font-display font-bold text-foreground">
+                                                    LKR {service.price}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <Link
+                                            to={`/contact?service=${service.id}`}
+                                            className="w-full h-12 bg-[#D4AF37] hover:bg-[#b5952f] text-white flex items-center justify-center rounded-md font-semibold tracking-wide transition-colors shadow-md shadow-gold/20"
+                                        >
+                                            Book Now
+                                        </Link>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Benefits Split Section */}
+            <section className="py-0 bg-charcoal text-white">
+                <div className="flex flex-col lg:flex-row">
+                    <div className="w-full lg:w-1/2 p-12 lg:p-24 flex flex-col justify-center">
+                        <span className="text-gold uppercase tracking-[0.2em] text-sm font-semibold mb-4">The Glow Up</span>
+                        <h2 className="font-display text-4xl lg:text-5xl font-bold mb-8">
+                            Personalized <br /> Skin Science
+                        </h2>
+                        <p className="text-white/70 text-lg leading-relaxed mb-10">
+                            Not all faces are the same. Our aestheticians deeply analyze your skin before beginning any regimen.
+                            We use clinically proven ingredients and world-class technology to transform your complexion.
+                        </p>
+                        <ul className="space-y-4">
+                            {[
+                                "Deep pore extraction & purification",
+                                "Anti-aging serum infusions",
+                                "Dermatologist-approved products",
+                                "Luxurious facial massage techniques"
+                            ].map((item, i) => (
+                                <li key={i} className="flex items-center gap-3 text-white/90">
+                                    <div className="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center text-gold shrink-0">
+                                        <Info size={12} />
+                                    </div>
+                                    {item}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div className="w-full lg:w-1/2 h-[500px] lg:h-auto min-h-[500px] relative">
+            <iframe 
+              className="absolute inset-0 w-full h-full"
+              src="https://www.youtube.com/embed/LXb3EKWsInQ?mute=1&autoplay=1&loop=1&playlist=LXb3EKWsInQ" 
+              title="YouTube video player" 
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen>
+            </iframe>
+          </div>
+        </div>
+      </section>
+
+            <CTABanner />
+            <Footer />
+            <WhatsAppButton />
+        </div>
+    );
+};
+
+export default Facials;

@@ -10,6 +10,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import PageTransition from "@/components/PageTransition";
 import ChatBot from "@/components/ChatBot";
+import WelcomeVoice from "@/components/WelcomeVoice";
 import PublicLayout from "@/pages/PublicLayout";
 
 // Lazy-loaded public pages
@@ -19,6 +20,14 @@ const Services = lazy(() => import("./pages/Services"));
 const Gallery = lazy(() => import("./pages/Gallery"));
 const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
+const ChemicalPeels = lazy(() => import("./pages/services/ChemicalPeels"));
+const Facials = lazy(() => import("./pages/services/Facials"));
+const WaxingTreatments = lazy(() => import("./pages/services/WaxingTreatments"));
+const SpecializedProcedures = lazy(() => import("./pages/services/SpecializedProcedures"));
+const AntiAgingTreatments = lazy(() => import("./pages/services/AntiAgingTreatments"));
+const IntimateAreaServices = lazy(() => import("./pages/services/IntimateAreaServices"));
+const WartRemoval = lazy(() => import("./pages/services/WartRemoval"));
+const MicroDermabrasion = lazy(() => import("./pages/services/MicroDermabrasion"));
 const Blog = lazy(() => import("./pages/Blog"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -69,6 +78,14 @@ const AnimatedRoutes = () => {
           <Route path="/" element={<Index />} />
           <Route path="/products" element={<Products />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/services/chemical-peels" element={<ChemicalPeels />} />
+          <Route path="/services/facials" element={<Facials />} />
+          <Route path="/services/waxing" element={<WaxingTreatments />} />
+          <Route path="/services/specialized" element={<SpecializedProcedures />} />
+          <Route path="/services/anti-aging" element={<AntiAgingTreatments />} />
+          <Route path="/services/intimate" element={<IntimateAreaServices />} />
+          <Route path="/services/wart-removal" element={<WartRemoval />} />
+          <Route path="/services/micro-dermabrasion" element={<MicroDermabrasion />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
@@ -116,6 +133,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <ScrollToTop />
+              <WelcomeVoice />
               <AnimatedRoutes />
               <ChatBot />
             </BrowserRouter>
