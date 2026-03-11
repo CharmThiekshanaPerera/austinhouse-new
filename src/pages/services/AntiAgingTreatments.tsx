@@ -189,6 +189,11 @@ const AntiAgingTreatments = () => {
                     setIsBookingModalOpen(true);
                 }}
             />
+            <BookingModal
+                open={isBookingModalOpen}
+                onOpenChange={setIsBookingModalOpen}
+                preselectedService={bookingServiceTitle}
+            />
         </div>
     );
 };

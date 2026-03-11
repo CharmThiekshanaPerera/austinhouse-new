@@ -10,6 +10,7 @@ import { testimonialsApi } from "@/lib/testimonialsApi";
 import { contactMessagesApi } from "@/lib/contactMessagesApi";
 import { subscribersApi } from "@/lib/subscribersApi";
 import { galleryImagesApi, beforeAfterApi, BeforeAfterPair } from "@/lib/galleryApi";
+import { ordersApi } from "@/lib/ordersApi";
 
 export type { BeforeAfterPair } from "@/lib/galleryApi";
 
@@ -140,6 +141,26 @@ export interface RevenueEntry {
   createdAt: string;
 }
 
+export interface Order {
+  id: string;
+  items: {
+    product_id: string;
+    name: string;
+    quantity: number;
+    price: number;
+    image: string;
+  }[];
+  total: number;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  address: string;
+  city: string;
+  payment_method: "COD" | "Card";
+  status: "Pending" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
+  createdAt: string;
+}
+
 export interface ActivityLog {
   id: string;
   action: string;
@@ -162,6 +183,7 @@ interface DataContextType {
   activityLogs: ActivityLog[];
   galleryImages: GalleryImage[];
   beforeAfterPairs: BeforeAfterPair[];
+  orders: Order[];
   // Loading states
   servicesLoading: boolean;
   productsLoading: boolean;
@@ -174,6 +196,7 @@ interface DataContextType {
   contactMessagesLoading: boolean;
   galleryLoading: boolean;
   subscribersLoading: boolean;
+  ordersLoading: boolean;
   // Products
   addProduct: (p: Omit<Product, "id">) => Promise<Product>;
   updateProduct: (p: Product) => Promise<Product>;
@@ -186,6 +209,7 @@ interface DataContextType {
   addBooking: (b: Omit<Booking, "id">) => Promise<Booking>;
   updateBooking: (id: string, b: Partial<Omit<Booking, "id">>) => Promise<Booking>;
   deleteBooking: (id: string) => Promise<void>;
+  isSlotAvailable: (date: string, time: string) => boolean;
   // Staff (API-backed)
   addStaff: (s: Omit<Staff, "id">) => Promise<Staff>;
   updateStaff: (id: string, s: Partial<Omit<Staff, "id">>) => Promise<Staff>;
@@ -220,6 +244,10 @@ interface DataContextType {
   addNewsletterSubscriber: (email: string) => Promise<NewsletterSubscriber>;
   updateNewsletterSubscriber: (s: NewsletterSubscriber) => Promise<NewsletterSubscriber>;
   deleteNewsletterSubscriber: (id: string) => Promise<void>;
+  // Orders
+  addOrder: (o: Omit<Order, "id" | "createdAt" | "status">) => Promise<Order>;
+  updateOrder: (id: string, o: Partial<Omit<Order, "id" | "createdAt">>) => Promise<Order>;
+  deleteOrder: (id: string) => Promise<void>;
   // Local-only
   addRevenueEntry: (r: Omit<RevenueEntry, "id" | "createdAt">) => void;
   updateRevenueEntry: (r: RevenueEntry) => void;
@@ -250,6 +278,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [beforeAfterPairs, setBeforeAfterPairs] = useState<BeforeAfterPair[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
 
   // Loading states
   const [servicesLoading, setServicesLoading] = useState(true);
@@ -263,6 +292,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [contactMessagesLoading, setContactMessagesLoading] = useState(true);
   const [galleryLoading, setGalleryLoading] = useState(true);
   const [subscribersLoading, setSubscribersLoading] = useState(true);
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
   const addActivityLog = (action: string, detail: string) =>
     setActivityLogs(prev =>
@@ -451,6 +481,22 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     return () => { cancelled = true; };
   }, []);
 
+  // ─── Orders ─────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const remote = await ordersApi.list();
+        if (!cancelled) setOrders(remote);
+      } catch (e) {
+        console.warn("Failed to load orders from API.", e);
+      } finally {
+        if (!cancelled) setOrdersLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   // ─── Product CRUD ────────────────────────────────────────────────────────────
   const addProduct = async (p: Omit<Product, "id">) => {
     const created = await productsApi.create(p);
@@ -494,7 +540,15 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // ─── Booking CRUD ────────────────────────────────────────────────────────────
+  const isSlotAvailable = (date: string, time: string) => {
+    return !bookings.some(b => b.date === date && b.time === time && b.status !== "Cancelled");
+  };
+
   const addBooking = async (b: Omit<Booking, "id">) => {
+    // Prevent double booking on client side
+    if (!isSlotAvailable(b.date, b.time)) {
+      throw new Error("This time slot is already booked.");
+    }
     const created = await bookingsApi.create(b);
     setBookings(prev => [...prev, created]);
     addActivityLog("Booking Created", `${b.customer_name} - ${b.date}`);
@@ -696,6 +750,27 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     addActivityLog("Subscriber Removed", id);
   };
 
+  // ─── Order CRUD ─────────────────────────────────────────────────────────────
+  const addOrder = async (o: Omit<Order, "id" | "createdAt" | "status">) => {
+    const created = await ordersApi.create(o);
+    setOrders(prev => [created, ...prev]);
+    addActivityLog("Order Placed", `${created.customer_name} - LKR ${created.total}`);
+    return created;
+  };
+
+  const updateOrder = async (id: string, o: Partial<Omit<Order, "id" | "createdAt">>) => {
+    const updated = await ordersApi.update(id, o);
+    setOrders(prev => prev.map(x => (x.id === id ? updated : x)));
+    addActivityLog("Order Updated", `${updated.customer_name} → ${updated.status}`);
+    return updated;
+  };
+
+  const deleteOrder = async (id: string) => {
+    await ordersApi.remove(id);
+    setOrders(prev => prev.filter(x => x.id !== id));
+    addActivityLog("Order Deleted", id);
+  };
+
   const addRevenueEntry = (r: Omit<RevenueEntry, "id" | "createdAt">) => {
     setRevenueEntries(prev => [...prev, { ...r, id: `r_${Date.now()}`, createdAt: new Date().toISOString() }]);
     addActivityLog("Revenue Added", `${r.amount}`);
@@ -739,6 +814,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         contactMessagesLoading,
         galleryLoading,
         subscribersLoading,
+        ordersLoading,
         addProduct,
         updateProduct,
         deleteProduct,
@@ -748,6 +824,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         addBooking,
         updateBooking,
         deleteBooking,
+        isSlotAvailable,
         addStaff,
         updateStaff,
         deleteStaff,
@@ -768,6 +845,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         addNewsletterSubscriber,
         updateNewsletterSubscriber,
         deleteNewsletterSubscriber,
+        orders,
+        addOrder,
+        updateOrder,
+        deleteOrder,
         addRevenueEntry,
         updateRevenueEntry,
         deleteRevenueEntry,

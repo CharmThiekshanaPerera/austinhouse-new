@@ -206,6 +206,11 @@ const ChemicalPeels = () => {
                     setIsBookingModalOpen(true);
                 }}
             />
+            <BookingModal
+                open={isBookingModalOpen}
+                onOpenChange={setIsBookingModalOpen}
+                preselectedService={bookingServiceTitle}
+            />
         </div>
     );
 };

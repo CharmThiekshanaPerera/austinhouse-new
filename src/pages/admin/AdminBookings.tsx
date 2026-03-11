@@ -304,7 +304,7 @@ const AdminBookings = () => {
                         <Badge variant="outline" className={cn("text-xs font-body", config.className)}>{config.label}</Badge>
                       </div>
                       <p className="text-muted-foreground font-body text-xs mt-1">
-                        {b.customer_email} · {b.date ? format(parseISO(b.date), "MMM d, yyyy") : "N/A"} · {b.time}
+                        {b.customer_email} · {b.customer_phone} · {b.date ? format(parseISO(b.date), "MMM d, yyyy") : "N/A"} · {b.time}
                       </p>
                       <p className="text-muted-foreground font-body text-xs">
                         {serviceMap[b.service_id] ?? b.service_id}

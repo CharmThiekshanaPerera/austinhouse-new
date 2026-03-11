@@ -31,7 +31,7 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const { addBooking, services } = useData();
+  const { addBooking, services, bookings } = useData();
 
   // Pre-select service by title match when preselectedService prop changes
   useEffect(() => {
@@ -151,21 +151,37 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
           <div>
             <label className="block text-sm font-body text-muted-foreground mb-2">Preferred Time</label>
             <div className="grid grid-cols-3 gap-2">
-              {timeSlots.map((slot) => (
-                <button
-                  key={slot}
-                  type="button"
-                  onClick={() => setTimeSlot(slot)}
-                  className={cn(
-                    "px-3 py-2 rounded-sm font-body text-xs tracking-wider transition-all border",
-                    timeSlot === slot
-                      ? "bg-gold-gradient text-primary-foreground border-transparent shadow-gold"
-                      : "bg-background border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
-                  )}
-                >
-                  {slot}
-                </button>
-              ))}
+              {timeSlots.map((slot) => {
+                const isBusy = date && bookings.some(b => 
+                  b.date === format(date, "yyyy-MM-dd") && 
+                  b.time === slot && 
+                  b.status !== "Cancelled"
+                );
+
+                return (
+                  <button
+                    key={slot}
+                    type="button"
+                    disabled={isBusy}
+                    onClick={() => setTimeSlot(slot)}
+                    className={cn(
+                      "px-3 py-2 rounded-sm font-body text-xs tracking-wider transition-all border relative overflow-hidden",
+                      timeSlot === slot
+                        ? "bg-gold-gradient text-primary-foreground border-transparent shadow-gold"
+                        : isBusy 
+                          ? "bg-muted/50 border-border text-muted-foreground cursor-not-allowed opacity-50"
+                          : "bg-background border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
+                    )}
+                  >
+                    {slot}
+                    {isBusy && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/20 backdrop-blur-[1px]">
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground/50 rotate-[-15deg]">Booked</span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -193,7 +209,7 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
               />
             </div>
             <div>
-              <label className="block text-sm font-body text-muted-foreground mb-2">Phone</label>
+              <label className="block text-sm font-body text-muted-foreground mb-2">Mobile Phone</label>
               <input
                 type="tel"
                 required

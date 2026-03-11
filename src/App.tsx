@@ -30,6 +30,7 @@ const IntimateAreaServices = lazy(() => import("./pages/services/IntimateAreaSer
 const WartRemoval = lazy(() => import("./pages/services/WartRemoval"));
 const MicroDermabrasion = lazy(() => import("./pages/services/MicroDermabrasion"));
 const Blog = lazy(() => import("./pages/Blog"));
+const Checkout = lazy(() => import("./pages/Checkout"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy-loaded admin pages
@@ -58,6 +59,7 @@ const AdminGiftCards = lazy(() => import("./pages/admin/AdminGiftCards"));
 const AdminWaitlist = lazy(() => import("./pages/admin/AdminWaitlist"));
 const AdminEmailTemplates = lazy(() => import("./pages/admin/AdminEmailTemplates"));
 const AdminExpenses = lazy(() => import("./pages/admin/AdminExpenses"));
+const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
     <div className="text-center space-y-4">
@@ -91,12 +93,14 @@ const AnimatedRoutes = () => {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/checkout" element={<Checkout />} />
         </Route>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="services" element={<AdminServices />} />
           <Route path="bookings" element={<AdminBookings />} />
+          <Route path="orders" element={<AdminOrders />} />
           <Route path="blog" element={<AdminBlog />} />
           <Route path="testimonials" element={<AdminTestimonials />} />
           <Route path="messages" element={<AdminMessages />} />

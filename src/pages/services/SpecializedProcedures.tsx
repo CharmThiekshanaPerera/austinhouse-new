@@ -188,6 +188,11 @@ const SpecializedProcedures = () => {
                     setIsBookingModalOpen(true);
                 }}
             />
+            <BookingModal
+                open={isBookingModalOpen}
+                onOpenChange={setIsBookingModalOpen}
+                preselectedService={bookingServiceTitle}
+            />
         </div>
     );
 };
