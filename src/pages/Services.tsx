@@ -1,78 +1,34 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Clock, Star, CheckCircle } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight } from "lucide-react";
 import Footer from "@/components/Footer";
-import BookingModal from "@/components/BookingModal";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import SEO from "@/components/SEO";
-import { useData } from "@/contexts/DataContext";
+import { useEffect } from "react";
 
-const ServiceRowSkeleton = () => (
-  <div className="grid lg:grid-cols-2 gap-10 items-center animate-pulse">
-    <div className="rounded-lg h-[300px] lg:h-[400px] bg-muted" />
-    <div className="space-y-4">
-      <div className="h-3 bg-muted rounded w-1/4" />
-      <div className="h-7 bg-muted rounded w-3/4" />
-      <div className="h-4 bg-muted rounded w-full" />
-      <div className="h-4 bg-muted rounded w-5/6" />
-      <div className="grid grid-cols-2 gap-3">
-        {[...Array(4)].map((_, i) => <div key={i} className="h-3 bg-muted rounded" />)}
-      </div>
-      <div className="flex gap-4 mt-2">
-        <div className="h-8 bg-muted rounded w-24" />
-        <div className="h-8 bg-muted rounded w-32" />
-      </div>
-    </div>
-  </div>
-);
+export const serviceCategories = [
+  { id: 'facials', name: 'Facials', image: '/category_images/facials.png', path: '/services/facials' },
+  { id: 'chemical-peels', name: 'Chemical Peels', image: '/category_images/peels.png', path: '/services/chemical-peels' },
+  { id: 'waxing', name: 'Waxing Treatments', image: '/category_images/waxing.png', path: '/services/waxing' },
+  { id: 'specialized', name: 'Specialized Procedures', image: '/category_images/specialized.png', path: '/services/specialized' },
+  { id: 'anti-aging', name: 'Anti-Aging & Tightening', image: '/category_images/anti_aging.png', path: '/services/anti-aging' },
+  { id: 'intimate', name: 'Intimate Area Services', image: '/category_images/intimate.png', path: '/services/intimate' },
+  { id: 'wart-removal', name: 'Wart & Skin Tag Removal', image: '/category_images/wart_removal.png', path: '/services/wart-removal' },
+  { id: 'micro-dermabrasion', name: 'Micro-Dermabrasion', image: '/category_images/microderm.png', path: '/services/micro-dermabrasion' },
+];
 
 const Services = () => {
-  const [bookingOpen, setBookingOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState("");
-  const { services, servicesLoading } = useData();
-
-  const handleBookNow = (title: string) => {
-    setSelectedService(title);
-    setBookingOpen(true);
-  };
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Services"
-        description="Explore our premium beauty services — facials, laser hair removal, manicures, waxing, microdermabrasion & massage therapy at Austin House, Colombo."
+        title="Our Services - Aesthetic Treatments"
+        description="Explore our premium beauty services including facials, chemical peels, waxing, anti-aging, and specialized procedures."
         canonical="https://bright-living-clone.lovable.app/services"
-        ogImage="https://bright-living-clone.lovable.app/og-services.jpg"
-        breadcrumbs={[
-          { name: "Home", url: "https://bright-living-clone.lovable.app/" },
-          { name: "Services", url: "https://bright-living-clone.lovable.app/services" },
-        ]}
-        jsonLd={{
-          "@context": "https://schema.org",
-          "@type": "ItemList",
-          name: "Austin House Beauty & Spa Services",
-          itemListElement: services.map((s, i) => ({
-            "@type": "ListItem",
-            position: i + 1,
-            item: {
-              "@type": "Service",
-              name: s.title,
-              description: s.description,
-              image: s.image,
-              provider: {
-                "@type": "LocalBusiness",
-                name: "Austin House Beauty & Spa",
-              },
-              offers: {
-                "@type": "Offer",
-                price: s.price.replace(/[^0-9.]/g, ""),
-                priceCurrency: "LKR",
-              },
-            },
-          })),
-        }}
       />
+      
       {/* Hero Banner */}
       <section className="pt-32 pb-16 bg-charcoal">
         <div className="container mx-auto px-4 lg:px-8 text-center">
@@ -81,128 +37,100 @@ const Services = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <p className="text-gold uppercase tracking-[0.3em] text-sm font-body mb-4">What We Offer</p>
+            <p className="text-gold uppercase tracking-[0.3em] text-sm font-body mb-4">Aesthetic Excellence</p>
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-cream mb-4">
-              Our <span className="text-gold-gradient">Services</span>
+              Explore Our <span className="text-gold-gradient">Services</span>
             </h1>
             <p className="text-cream/60 font-body text-lg max-w-2xl mx-auto">
-              Every treatment is a journey — meticulously crafted by experts using gold-standard protocols and the finest products from around the world.
+              Select a category below to discover our meticulously crafted treatments, guided by expertise, luxury, and transformative results.
             </p>
-            <div className="mt-4">
-              <Link to="/" className="text-gold hover:text-gold-light font-body text-sm transition-colors">
-                ← Back to Home
+            <div className="mt-8">
+              <Link to="/" className="text-gold hover:text-gold-light font-body text-sm transition-colors uppercase tracking-widest border-b border-gold pb-1">
+                Return Home
               </Link>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Services List */}
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="space-y-16">
-            {servicesLoading ? (
-              [...Array(3)].map((_, i) => <ServiceRowSkeleton key={i} />)
-            ) : (
-              services.map((service, index) => (
-                <motion.div
-                  key={service.id}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.7 }}
-                  className="grid lg:grid-cols-2 gap-10 items-center"
-                >
-                  <div className={index % 2 === 1 ? "lg:order-2" : ""}>
-                    <div className="rounded-lg overflow-hidden shadow-gold">
-                      <img
-                        src={service.image}
-                        alt={service.title}
-                        className="w-full h-[300px] lg:h-[400px] object-cover hover:scale-105 transition-transform duration-700"
-                        loading="lazy"
-                      />
-                    </div>
+      {/* Aesthetic Category Cards Grid */}
+      <section className="py-20 lg:py-28 bg-[#fdfcfb]">
+        <div className="container mx-auto px-4 lg:px-8 max-w-7xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+            {serviceCategories.map((category, index) => (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <Link to={category.path} className="group block relative h-[400px] w-full rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700">
+                  {/* Background Image */}
+                  <div className="absolute inset-0 w-full h-full">
+                    <img 
+                      src={category.image} 
+                      alt={category.name} 
+                      className="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-1000 ease-out"
+                    />
                   </div>
+                  
+                  {/* Elegant Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal/90 via-charcoal/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+                  
+                  {/* Hover Glow Effect */}
+                  <div className="absolute inset-0 bg-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                  <div className={index % 2 === 1 ? "lg:order-1" : ""}>
-                    <div className="flex items-center gap-4 mb-3">
-                      <div className="flex items-center gap-1 text-gold">
-                        <Star size={16} fill="currentColor" />
-                        <span className="font-body text-sm font-bold">{service.rating}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Clock size={14} />
-                        <span className="font-body text-sm">{service.duration}</span>
-                      </div>
-                    </div>
-
-                    <h2 className="font-display text-2xl lg:text-3xl font-bold text-foreground mb-4">
-                      {service.title}
+                  {/* Content inside the card */}
+                  <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col justify-end translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                    <h2 className="font-display text-2xl font-bold text-white mb-3 group-hover:text-gold transition-colors">
+                      {category.name}
                     </h2>
-
-                    <p className="text-muted-foreground font-body leading-relaxed mb-6">
-                      {service.description}
-                    </p>
-
-                    <div className="grid grid-cols-2 gap-3 mb-6">
-                      {service.benefits.map((benefit) => (
-                        <div key={benefit} className="flex items-start gap-2">
-                          <CheckCircle size={16} className="text-gold mt-0.5 flex-shrink-0" />
-                          <span className="text-sm font-body text-muted-foreground">{benefit}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center gap-6">
-                      <p className="font-display text-2xl font-bold text-gold-gradient">{service.price}</p>
-                      <button
-                        onClick={() => handleBookNow(service.title)}
-                        className="px-8 py-3 bg-gold-gradient text-primary-foreground font-body font-bold text-sm uppercase tracking-wider rounded-sm shadow-gold hover:opacity-90 transition-opacity"
-                      >
-                        Book Now
-                      </button>
+                    
+                    <div className="flex items-center text-white/80 font-body text-sm tracking-wider uppercase font-semibold gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                      Explore Services 
+                      <ArrowRight size={16} className="text-gold group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
-                </motion.div>
-              ))
-            )}
-
+                  
+                  {/* Decorative corner border on hover */}
+                  <div className="absolute top-4 left-4 w-8 h-8 border-t border-l border-gold/0 group-hover:border-gold/50 transition-colors duration-500" />
+                  <div className="absolute bottom-4 right-4 w-8 h-8 border-b border-r border-gold/0 group-hover:border-gold/50 transition-colors duration-500" />
+                </Link>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-charcoal">
-        <div className="container mx-auto px-4 lg:px-8 text-center">
+      <section className="py-24 bg-charcoal text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/10 rounded-full blur-[120px] pointer-events-none" />
+        
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-cream mb-4">
-              Not Sure Which Treatment Is <span className="text-gold-gradient">Right For You?</span>
+            <h2 className="font-display text-3xl md:text-5xl font-bold text-white mb-6">
+              Not Sure Which Treatment Is <br className="hidden md:block"/> <span className="text-gold-gradient">Right For You?</span>
             </h2>
-            <p className="text-cream/60 font-body text-lg max-w-xl mx-auto mb-8">
-              Book a complimentary consultation with our experts. We'll assess your needs and recommend a personalized treatment plan.
+            <p className="text-white/60 font-body text-lg max-w-2xl mx-auto mb-10">
+              Book a complimentary consultation with our aesthetic experts. We'll assess your unique needs and recommend a highly personalized treatment plan.
             </p>
-            <button
-              onClick={() => { setSelectedService(""); setBookingOpen(true); }}
-              className="inline-flex items-center justify-center px-10 py-4 bg-gold-gradient text-primary-foreground font-body font-bold tracking-wider uppercase text-sm rounded-sm shadow-gold hover:opacity-90 transition-opacity"
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-3 px-10 py-4 bg-gold hover:bg-[#b5952f] text-white font-body font-bold tracking-wider uppercase text-sm rounded-sm shadow-xl shadow-gold/20 transition-all"
             >
-              Book Free Consultation
-            </button>
+              Consult an Expert <ArrowRight size={16} />
+            </Link>
           </motion.div>
         </div>
       </section>
 
       <Footer />
-
-      <BookingModal
-        open={bookingOpen}
-        onOpenChange={setBookingOpen}
-        preselectedService={selectedService}
-      />
-      <WhatsAppButton />
     </div>
   );
 };

@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { MapPin, Phone, Mail, Clock, Send, Loader2 } from "lucide-react";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import SEO from "@/components/SEO";
 import { toast } from "@/hooks/use-toast";
 import { useData } from "@/contexts/DataContext";
@@ -10,10 +9,10 @@ import { useData } from "@/contexts/DataContext";
 import contactExterior from "@/assets/contact-exterior.jpg";
 
 const contactInfo = [
-  { icon: MapPin, title: "Visit Us", lines: ["123 Galle Road", "Colombo 03, Sri Lanka"] },
-  { icon: Phone, title: "Call Us", lines: ["+94 11 234 5678", "+94 77 123 4567"] },
-  { icon: Mail, title: "Email Us", lines: ["info@austinhouse.lk", "bookings@austinhouse.lk"] },
-  { icon: Clock, title: "Opening Hours", lines: ["Mon – Sat: 9:00 AM – 7:00 PM", "Sunday: 10:00 AM – 4:00 PM"] },
+  { icon: MapPin, title: "Visit Us", lines: ["No 22, Austin Place", "Colombo 08, Sri Lanka"] },
+  { icon: Phone, title: "Call Us", lines: ["+94 112196386", "+94 772030011 (WhatsApp)"] },
+  { icon: Mail, title: "Email Us", lines: ["info@austinhouse.lk"] },
+  { icon: Clock, title: "Opening Hours", lines: ["Monday – Sunday", "10:00 AM – 6:00 PM"] },
 ];
 
 const Contact = () => {
@@ -185,7 +184,7 @@ const Contact = () => {
               </h2>
               <div className="flex-1 rounded-lg overflow-hidden shadow-gold border border-border min-h-[400px]">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.9029751582974!2d79.8449853!3d6.9024186!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae25963c3640001%3A0xe5c1d58e8e190e4!2sColombo%2003%2C%20Sri%20Lanka!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.8123!2d79.8765!3d6.9123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae259a43a75871f%3A0x6a0536be8e47f7d!2s22%20Austin%20Pl%2C%20Colombo%2000800!5e0!3m2!1sen!2slk!4v1710174000000!5m2!1sen!2slk"
                   className="w-full h-full min-h-[400px]"
                   style={{ border: 0 }}
                   allowFullScreen
@@ -200,7 +199,6 @@ const Contact = () => {
       </section>
 
       <Footer />
-      <WhatsAppButton />
     </div>
   );
 };

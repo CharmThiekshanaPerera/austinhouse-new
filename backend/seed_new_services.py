@@ -1,0 +1,284 @@
+import asyncio
+from motor.motor_asyncio import AsyncIOMotorClient
+from app.settings import settings
+
+async def seed_new_services():
+    client = AsyncIOMotorClient(settings.mongodb_uri)
+    db = client[settings.mongodb_db]
+    
+    print(f"Connecting to database: {settings.mongodb_db} for new service seedings")
+
+    services_coll = db["services"]
+    
+    new_services = [
+        # Facials
+        {
+            "category": "Facials",
+            "title": "Signature Gold Facial",
+            "duration": "1.5 hrs",
+            "price": "15,000",
+            "rating": 5.0,
+            "description": "Experience the ultimate luxury with our 24K Signature Gold Facial. Designed to illuminate your complexion, reduce fine lines, and deeply nourish the skin using pure gold extracts and advanced serums.",
+            "image": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Facials",
+            "title": "Deep Cleansing Acne Facial",
+            "duration": "1 hr",
+            "price": "12,000",
+            "rating": 4.8,
+            "description": "A targeted treatment for blemish-prone skin. Includes rigorous extraction, high-frequency therapy to eliminate acne-causing bacteria, and a soothing mask to reduce inflammation.",
+            "image": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Facials",
+            "title": "Hydra-Glow Therapy",
+            "duration": "1.5 hrs",
+            "price": "18,000",
+            "rating": 4.9,
+            "description": "Instantly plump and hydrate your skin with our multi-step hydra therapy. Uses vortex-fusion technology to cleanse, extract, and intensely hydrate for an undeniable post-facial glow.",
+            "image": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+
+        # Chemical Peels
+        {
+            "category": "Chemical Peels",
+            "title": "Fractional Cell Regeneration Peel",
+            "duration": "2.5 hrs",
+            "price": "35,000",
+            "rating": 5.0,
+            "description": "Revitalize your skin with our exclusive Fractional Cellular Repair (FCR) by activating the innate immune system and promoting blood circulation. This advanced treatment combines cutting-edge technology with natural extracts to promote deep skin renewal, reduces acne and acne scars, reduce fine lines, and restore youthful radiance.",
+            "image": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Chemical Peels",
+            "title": "Sensitive Medical Peel",
+            "duration": "1 hr",
+            "price": "25,000",
+            "rating": 4.8,
+            "description": "FOXC peel is an all-in-one premium skin healing program with fruit fermented acid, oxygen therapy, vitamin c, and polyphenol. This advanced treatment combines the power of exfoliation with antioxidant-rich formulas to unveil a smoother, more youthful complexion. Perfect for reducing fine lines, acne scars, unwanted hyper-pigmentation and wrinkles.",
+            "image": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Chemical Peels",
+            "title": "Saree Jacket Line Peel",
+            "duration": "1 hr",
+            "price": "15,000",
+            "rating": 4.7,
+            "description": "Enhance the beauty of the elegant saree you wear, by having your saree jacket line treated with us before your big day. Indulge in our rejuvenating body peel, tailored like the elegance of a meticulously crafted saree jacket.",
+            "image": "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Chemical Peels",
+            "title": "Full Back Peel",
+            "duration": "1.5 hrs",
+            "price": "20,000",
+            "rating": 4.9,
+            "description": "From neck to waist, let us treat you, to have the most soft and beautiful skin you always wanted, to wear that backless dress you dreamt about. Revitalize your skin with our rejuvenating full back peel.",
+            "image": "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Chemical Peels",
+            "title": "Booty Peel",
+            "duration": "1 hr",
+            "price": "30,000",
+            "rating": 5.0,
+            "description": "Begin your journey to a flawless booty with foxcpeel. Rejuvenate your skin with our premium ingredients packed with antioxidants and treat your booty to the care it truly deserves!",
+            "image": "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Chemical Peels",
+            "title": "Vagi Peel",
+            "duration": "1.5 hrs",
+            "price": "20,000",
+            "rating": 4.8,
+            "description": "A gentle, yet effective peel designed to improve the texture and appearance of the intimate skin area. This treatment with its antioxidant rich formulas will help to exfoliate, brighten and unveil smoother skin. Especially designed for brightening darker vaginal areas, where you have the freedom to add on to include inside thighs if you wish for a full experience.",
+            "image": "https://images.unsplash.com/photo-1552693673-1bf958298935?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+
+        # Waxing Treatments
+        {
+            "category": "Waxing Treatments",
+            "title": "Full Body Waxing",
+            "duration": "2 hrs",
+            "price": "18,000",
+            "rating": 4.9,
+            "description": "Enjoy silky smooth skin from head to toe. Our premium full body waxing uses gentle, hard wax formulations that minimize pain and reduce ingrown hairs, leaving your skin perfectly smooth for weeks.",
+            "image": "https://images.unsplash.com/photo-1556228578-8d89b6acd8d3?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Waxing Treatments",
+            "title": "Brazilian Wax",
+            "duration": "45 mins",
+            "price": "6,000",
+            "rating": 4.7,
+            "description": "Complete hair removal using specialized sensitive-skin wax. Our highly trained staff ensures a comfortable, hygienic, and swift experience in a private, luxurious setting.",
+            "image": "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Waxing Treatments",
+            "title": "Half Legs & Arms",
+            "duration": "1 hr",
+            "price": "5,500",
+            "rating": 4.8,
+            "description": "A quick maintenance session to keep your limbs flawlessly smooth. Finished with a deep hydrating oil massage to soothe the follicles.",
+            "image": "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+
+        # Specialized Procedures
+        {
+            "category": "Specialized Procedures",
+            "title": "Laser Hair Reduction",
+            "duration": "1 - 2 hrs",
+            "price": "15,000", # Changed "From 15,000" to "15,000" because price field in API is generic string, but keeping it simple
+            "rating": 4.9,
+            "description": "Achieve permanent hair reduction using advanced diode laser technology. Safe for all skin types, our laser treatments effectively target hair follicles to prevent future growth, ensuring long-lasting smooth skin.",
+            "image": "https://images.unsplash.com/photo-1512290746430-3ffb4fab31bc?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Specialized Procedures",
+            "title": "PRP Therapy (Vampire Facial)",
+            "duration": "1.5 hrs",
+            "price": "45,000",
+            "rating": 4.8,
+            "description": "Platelet-Rich Plasma therapy uses your body's own growth factors to stimulate collagen production. Excellent for acne scarring, overall skin rejuvenation, and restoring a youthful glow.",
+            "image": "https://images.unsplash.com/photo-1519014816548-bf5fe059e98b?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Specialized Procedures",
+            "title": "Advanced Microneedling",
+            "duration": "1 hr",
+            "price": "22,000",
+            "rating": 4.7,
+            "description": "A minimally invasive procedure that creates micro-punctures in the skin to trigger collagen and elastin synthesis. Highly effective for texture improvement and pore size reduction.",
+            "image": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+
+        # Anti-aging Skin Tightening Treatments
+        {
+            "category": "Anti-aging Skin Tightening Treatments",
+            "title": "HIFU Face Lifting",
+            "duration": "2 hrs",
+            "price": "45,000",
+            "rating": 5.0,
+            "description": "High-Intensity Focused Ultrasound (HIFU) delivers focused energy to the deep structural layers of the skin, stimulating collagen production for a non-surgical facelift effect.",
+            "image": "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Anti-aging Skin Tightening Treatments",
+            "title": "RF Skin Tightening",
+            "duration": "1 hr",
+            "price": "20,000",
+            "rating": 4.8,
+            "description": "Radiofrequency treatments heat the dermal layers to immediately tighten existing collagen fibers and promote new collagen growth, reducing sagging and fine lines.",
+            "image": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Anti-aging Skin Tightening Treatments",
+            "title": "Thermage FLX",
+            "duration": "1.5 hrs",
+            "price": "75,000",
+            "rating": 4.9,
+            "description": "The gold standard in non-invasive skin tightening. A single treatment provides immediate smoothing with results that continue to improve over six months.",
+            "image": "https://images.unsplash.com/photo-1620916297397-a4a5402a3c6c?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+
+        # Intimate Area Services
+        {
+            "category": "Intimate Area Services",
+            "title": "Intimate Area Brightening",
+            "duration": "1 hr",
+            "price": "18,000",
+            "rating": 4.8,
+            "description": "A specialized, gentle treatment designed to safely reduce hyperpigmentation in delicate areas. Uses medical-grade brightening serums and mild exfoliants for an even skin tone.",
+            "image": "https://images.unsplash.com/photo-1552693673-1bf958298935?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Intimate Area Services",
+            "title": "Bikini Line Facial (Vajacial)",
+            "duration": "45 mins",
+            "price": "12,000",
+            "rating": 4.7,
+            "description": "Perfect for post-wax care. This soothing treatment cleanses, gently exfoliates, extracts ingrown hairs, and deeply moisturizes the bikini line for flawless, bump-free skin.",
+            "image": "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+
+        # Wart Removal
+        {
+            "category": "Wart Removal",
+            "title": "CO2 Laser Wart Removal (Small Area)",
+            "duration": "30 mins",
+            "price": "5,000",
+            "rating": 4.8,
+            "description": "A fast, precise, and virtually painless procedure using advanced CO2 laser technology to vaporize warts and skin tags with minimal scarring.",
+            "image": "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Wart Removal",
+            "title": "CO2 Laser Removal (Large/Multiple)",
+            "duration": "1 hr",
+            "price": "12,000",
+            "rating": 4.7,
+            "description": "Comprehensive removal of multiple skin tags or larger warts. Includes local anesthesia numbing cream for a comfortable experience.",
+            "image": "https://images.unsplash.com/photo-1519014816548-bf5fe059e98b?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+
+        # Micro-Dermabrasion
+        {
+            "category": "Micro-Dermabrasion",
+            "title": "Diamond Micro-Dermabrasion",
+            "duration": "1 hr",
+            "price": "15,000",
+            "rating": 4.9,
+            "description": "An exceptional exfoliating treatment using a diamond-tipped wand to gently sand away the thick outer layer of the skin. Rejuvenates sun-damaged skin, reduces acne scars, and evens out skin tone.",
+            "image": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80",
+            "benefits": []
+        },
+        {
+            "category": "Micro-Dermabrasion",
+            "title": "Crystal Micro-Dermabrasion",
+            "duration": "1 hr",
+            "price": "12,000",
+            "rating": 4.8,
+            "description": "Utilizes ultra-fine crystals to blast away dead skin cells. Excellent for deep exfoliation, unclogging pores, and preparing the skin for maximum serum absorption.",
+            "image": "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?auto=format&fit=crop&q=80",
+            "benefits": []
+        }
+    ]
+
+    for service in new_services:
+        # Check if already exists by title
+        exists = await services_coll.find_one({"title": service["title"]})
+        if not exists:
+            await services_coll.insert_one(service)
+            print(f"✅ Addrd: {service['title']}")
+        else:
+            print(f"ℹ️ Already exists: {service['title']}")
+            
+    client.close()
+    print("🏁 Done inserting new service pages data!")
+
+if __name__ == "__main__":
+    asyncio.run(seed_new_services())

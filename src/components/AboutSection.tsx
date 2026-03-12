@@ -24,7 +24,7 @@ const AboutSection = () => {
             <p className="text-muted-foreground font-body leading-relaxed">
               Our protocols adhere to gold standards backed by original research. Every procedure is meticulously designed for optimal safety and efficacy, following globally recognized practices. Our team stays at the forefront of innovation, guaranteeing you the highest quality care and results that speak for themselves.
             </p>
-            <div className="mt-8 flex gap-12">
+            {/* <div className="mt-8 flex gap-12">
               <div>
                 <p className="font-display text-3xl font-bold text-gold-gradient">
                   <AnimatedCounter target={15} suffix="+" />
@@ -43,7 +43,7 @@ const AboutSection = () => {
                 </p>
                 <p className="text-muted-foreground text-sm font-body mt-1">Treatments</p>
               </div>
-            </div>
+            </div> */}
           </motion.div>
 
           <motion.div

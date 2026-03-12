@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,27 +7,44 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useData, Staff } from "@/contexts/DataContext";
-import { UserCog, Clock, Plus, Pencil, Trash2, Loader2, Upload, Eye, EyeOff } from "lucide-react";
+import { UserCog, Clock, Plus, Pencil, Trash2, Loader2, Upload, Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react";
 import { uploadImage } from "@/lib/uploadsApi";
+import { 
+  format, startOfWeek, addDays, subWeeks, addWeeks, 
+  isSameDay, parseISO 
+} from "date-fns";
 
 const STAFF_COLORS = [
   "bg-purple-500", "bg-blue-500", "bg-green-500", "bg-pink-500",
   "bg-orange-500", "bg-teal-500", "bg-red-500", "bg-indigo-500",
 ];
 
-const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const hours = ["9AM", "10AM", "11AM", "12PM", "1PM", "2PM", "3PM", "4PM", "5PM", "6PM"];
+const hours = [
+  { label: "9AM", value: 9 },
+  { label: "10AM", value: 10 },
+  { label: "11AM", value: 11 },
+  { label: "12PM", value: 12 },
+  { label: "1PM", value: 13 },
+  { label: "2PM", value: 14 },
+  { label: "3PM", value: 15 },
+  { label: "4PM", value: 16 },
+  { label: "5PM", value: 17 },
+  { label: "6PM", value: 18 }
+];
 
 const emptyForm = { name: "", role: "", email: "", phone: "", bio: "", image: "", show_in_frontend: true };
 
 const AdminStaff = () => {
-  const { staff, addStaff, updateStaff, deleteStaff, staffLoading } = useData();
+  const { staff, addStaff, updateStaff, deleteStaff, staffLoading, bookings, services } = useData();
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Staff | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 })); // Start on Monday
+
+  const daysOfWeek = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
 
   const getInitials = (name: string) =>
     name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
@@ -220,28 +238,85 @@ const AdminStaff = () => {
         </div>
       )}
 
-      {/* Weekly schedule grid (visual reference only) */}
+      {/* Weekly schedule grid */}
       <Card>
         <CardHeader>
-          <CardTitle className="font-display text-lg flex items-center gap-2">
-            <Clock size={18} className="text-primary" /> Weekly Schedule (Visual Reference)
-          </CardTitle>
-          <p className="text-xs text-muted-foreground font-body">Schedule visualisation — manage shifts by assigning bookings to staff</p>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <CardTitle className="font-display text-lg flex items-center gap-2">
+                <Clock size={18} className="text-gold" /> Weekly Staff Schedule
+              </CardTitle>
+              <p className="text-xs text-muted-foreground font-body">Assignments based on confirmed bookings for the week of {format(currentWeekStart, "MMM d, yyyy")}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => setCurrentWeekStart(prev => subWeeks(prev, 1))}>
+                <ChevronLeft size={16} />
+              </Button>
+              <Button variant="outline" size="sm" className="text-[10px] font-bold uppercase tracking-wider h-8" onClick={() => setCurrentWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }))}>
+                Today
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setCurrentWeekStart(prev => addWeeks(prev, 1))}>
+                <ChevronRight size={16} />
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="overflow-x-auto">
-          <div className="min-w-[700px]">
-            <div className="grid grid-cols-8 gap-px bg-border rounded-lg overflow-hidden">
-              <div className="bg-card p-2" />
-              {days.map(d => (
-                <div key={d} className="bg-card p-2 text-center font-body text-xs font-semibold text-foreground">{d}</div>
+          <div className="min-w-[800px]">
+            <div className="grid grid-cols-[80px_repeat(7,1fr)] gap-px bg-border rounded-lg overflow-hidden border border-border">
+              {/* Header row */}
+              <div className="bg-muted/50 p-3 flex items-center justify-center font-bold text-[10px] uppercase tracking-widest text-muted-foreground border-b border-r border-border">Time</div>
+              {daysOfWeek.map(day => (
+                <div key={day.toISOString()} className={cn(
+                  "bg-muted/50 p-3 text-center border-b border-border transition-colors",
+                  isSameDay(day, new Date()) && "bg-gold/5"
+                )}>
+                  <p className="font-body text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{format(day, "EEE")}</p>
+                  <p className="font-display text-sm font-bold text-foreground">{format(day, "d")}</p>
+                </div>
               ))}
+
+              {/* Grid rows */}
               {hours.map(h => (
-                <>
-                  <div key={h} className="bg-card p-2 font-body text-xs text-muted-foreground">{h}</div>
-                  {days.map(d => (
-                    <div key={`${d}-${h}`} className="bg-card p-1 min-h-[36px]" />
-                  ))}
-                </>
+                <React.Fragment key={h.label}>
+                  <div className="bg-card p-3 flex items-center justify-center font-body text-[10px] text-muted-foreground font-bold border-r border-border">{h.label}</div>
+                  {daysOfWeek.map(day => {
+                    // Find bookings for this day and hour
+                    const slotBookings = bookings.filter(b => {
+                      if (!b.date || !b.time || b.status === "Cancelled") return false;
+                      const bDate = parseISO(b.date);
+                      const bHour = parseInt(b.time.split(":")[0]);
+                      return isSameDay(day, bDate) && bHour === h.value;
+                    });
+
+                    return (
+                      <div key={`${day.toISOString()}-${h.label}`} className="bg-card p-1.5 min-h-[60px] relative group hover:bg-muted/5 transition-colors">
+                        <div className="flex flex-col gap-1">
+                          {slotBookings.map(b => {
+                            const assignedStaff = b.staff_id ? staff.find(s => s.id === b.staff_id) : null;
+                            const service = services.find(s => s.id === b.service_id);
+                            
+                            return (
+                              <div 
+                                key={b.id} 
+                                className={cn(
+                                  "p-1.5 rounded text-[9px] font-bold text-white shadow-sm border border-black/5 leading-tight",
+                                  assignedStaff ? getColor(assignedStaff.id) : "bg-slate-400"
+                                )}
+                                title={`${b.customer_name} - ${service?.title ?? "Product/Service"}`}
+                              >
+                                <div className="flex flex-col truncate">
+                                  <span>{assignedStaff ? getInitials(assignedStaff.name) : "Unassigned"}</span>
+                                  <span className="opacity-80 font-normal">{(service?.title || "Booking").slice(0, 10)}...</span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </React.Fragment>
               ))}
             </div>
           </div>

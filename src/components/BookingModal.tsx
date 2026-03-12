@@ -29,8 +29,9 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
   const [timeSlot, setTimeSlot] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const { addBooking, services } = useData();
+  const { addBooking, services, bookings } = useData();
 
   // Pre-select service by title match when preselectedService prop changes
   useEffect(() => {
@@ -50,18 +51,20 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
       setTimeSlot("");
       setName("");
       setEmail("");
+      setPhone("");
     }
   }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!date || !serviceId || !timeSlot || !name || !email) return;
+    if (!date || !serviceId || !timeSlot || !name || !email || !phone) return;
 
     setSubmitting(true);
     try {
       await addBooking({
         customer_name: name,
         customer_email: email,
+        customer_phone: phone,
         service_id: serviceId,
         staff_id: null,
         date: format(date, "yyyy-MM-dd"),
@@ -148,26 +151,41 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
           <div>
             <label className="block text-sm font-body text-muted-foreground mb-2">Preferred Time</label>
             <div className="grid grid-cols-3 gap-2">
-              {timeSlots.map((slot) => (
-                <button
-                  key={slot}
-                  type="button"
-                  onClick={() => setTimeSlot(slot)}
-                  className={cn(
-                    "px-3 py-2 rounded-sm font-body text-xs tracking-wider transition-all border",
-                    timeSlot === slot
-                      ? "bg-gold-gradient text-primary-foreground border-transparent shadow-gold"
-                      : "bg-background border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
-                  )}
-                >
-                  {slot}
-                </button>
-              ))}
+              {timeSlots.map((slot) => {
+                const isBusy = date && bookings.some(b => 
+                  b.date === format(date, "yyyy-MM-dd") && 
+                  b.time === slot && 
+                  b.status !== "Cancelled"
+                );
+
+                return (
+                  <button
+                    key={slot}
+                    type="button"
+                    disabled={isBusy}
+                    onClick={() => setTimeSlot(slot)}
+                    className={cn(
+                      "px-3 py-2 rounded-sm font-body text-xs tracking-wider transition-all border relative overflow-hidden",
+                      timeSlot === slot
+                        ? "bg-gold-gradient text-primary-foreground border-transparent shadow-gold"
+                        : isBusy 
+                          ? "bg-muted/50 border-border text-muted-foreground cursor-not-allowed opacity-50"
+                          : "bg-background border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
+                    )}
+                  >
+                    {slot}
+                    {isBusy && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/20 backdrop-blur-[1px]">
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground/50 rotate-[-15deg]">Booked</span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Name & Email */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-body text-muted-foreground mb-2">Your Name</label>
               <input
@@ -190,11 +208,22 @@ const BookingModal = ({ open, onOpenChange, preselectedService }: BookingModalPr
                 placeholder="you@example.com"
               />
             </div>
+            <div>
+              <label className="block text-sm font-body text-muted-foreground mb-2">Mobile Phone</label>
+              <input
+                type="tel"
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-4 py-3 bg-background border border-border rounded-sm font-body text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                placeholder="+94 7X XXX XXXX"
+              />
+            </div>
           </div>
 
           <button
             type="submit"
-            disabled={!date || !serviceId || !timeSlot || !name || !email || submitting}
+            disabled={!date || !serviceId || !timeSlot || !name || !email || !phone || submitting}
             className="w-full py-4 bg-gold-gradient text-primary-foreground font-body font-bold tracking-wider uppercase text-sm rounded-sm shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {submitting && <Loader2 size={16} className="animate-spin" />}

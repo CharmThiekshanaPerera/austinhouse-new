@@ -4,7 +4,6 @@ import { ShoppingBag } from "lucide-react";
 import { useState, useMemo } from "react";
 import Footer from "@/components/Footer";
 import CartSidebar from "@/components/CartSidebar";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import SEO from "@/components/SEO";
 import { useCart } from "@/contexts/CartContext";
 import { useData } from "@/contexts/DataContext";
@@ -54,7 +53,31 @@ const Products = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO title="Products" description="Shop premium skincare products — serums, moisturizers, sunscreens, cleansers & eye creams curated by Austin House Beauty & Spa experts." canonical="https://bright-living-clone.lovable.app/products" ogImage="https://bright-living-clone.lovable.app/og-products.jpg" breadcrumbs={[{ name: "Home", url: "https://bright-living-clone.lovable.app/" }, { name: "Products", url: "https://bright-living-clone.lovable.app/products" }]} />
+      <SEO 
+        title="Products" 
+        description="Shop premium skincare products — serums, moisturizers, sunscreens, cleansers & eye creams curated by Austin House Beauty & Spa experts." 
+        keywords="luxury skincare sri lanka, clinical grade beauty products, professional serums, Austin House products, beauty spa shop"
+        canonical="https://bright-living-clone.lovable.app/products" 
+        ogImage="https://bright-living-clone.lovable.app/og-products.jpg" 
+        breadcrumbs={[{ name: "Home", url: "https://bright-living-clone.lovable.app/" }, { name: "Products", url: "https://bright-living-clone.lovable.app/products" }]} 
+        jsonLd={products.map(product => ({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          description: product.description,
+          image: product.image,
+          offers: {
+            "@type": "Offer",
+            price: product.price,
+            priceCurrency: "LKR",
+            availability: "https://schema.org/InStock"
+          },
+          brand: {
+            "@type": "Brand",
+            name: "Austin House"
+          }
+        }))}
+      />
       {/* Floating Cart Button */}
       {totalItems > 0 && (
         <button
@@ -165,7 +188,6 @@ const Products = () => {
 
       <Footer />
       <CartSidebar />
-      <WhatsAppButton />
     </div>
   );
 };

@@ -134,10 +134,13 @@ const ChatBot = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-24 right-6 z-50 w-14 h-14 rounded-full bg-gold-gradient shadow-gold flex items-center justify-center text-primary-foreground"
+            className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gold-gradient shadow-gold flex items-center justify-center text-primary-foreground group relative"
             aria-label="Open chat"
           >
-            <MessageCircle size={24} />
+            <Bot size={24} className="md:w-[28px] md:h-[28px]" />
+            <span className="absolute right-full mr-4 bg-charcoal text-cream text-[10px] md:text-xs font-body px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+              AI Assistant
+            </span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -238,12 +241,12 @@ const ChatBot = () => {
                   >
                     <CalendarPlus size={14} /> Book Now
                   </button>
-                  <button
+                  {/* <button
                     onClick={startCall}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-body font-semibold tracking-wide bg-green-500/10 text-green-600 hover:bg-green-500/20 transition-colors"
                   >
                     <Phone size={14} /> Call Assistant
-                  </button>
+                  </button> */}
                 </div>
 
                 {/* Input */}

@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import SEO from "@/components/SEO";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import GalleryGrid from "@/components/GalleryGrid";
@@ -111,7 +110,6 @@ const Gallery = () => {
       </section>
 
       <Footer />
-      <WhatsAppButton />
     </div>
   );
 };

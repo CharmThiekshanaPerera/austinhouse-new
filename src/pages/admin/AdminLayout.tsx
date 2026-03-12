@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Package, Scissors, CalendarDays, FileText, Star, Image,
   Mail, Users, DollarSign, BarChart3, Settings, LogOut, Menu, ChevronLeft, Share2, Search,
-  Heart, Boxes, UserCog, Percent, Contact, FileDown, CreditCard, Clock, MailOpen, Receipt, Loader2,
+  Heart, Boxes, UserCog, Percent, Contact, FileDown, CreditCard, Clock, MailOpen, Receipt, Loader2, ShoppingBag,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ const navItems = [
   { path: "/admin/products", icon: Package, label: "Products" },
   { path: "/admin/services", icon: Scissors, label: "Services" },
   { path: "/admin/bookings", icon: CalendarDays, label: "Bookings" },
+  { path: "/admin/orders", icon: ShoppingBag, label: "Product Orders" },
   { path: "/admin/blog", icon: FileText, label: "Blog Posts" },
   { path: "/admin/testimonials", icon: Star, label: "Testimonials" },
   { path: "/admin/messages", icon: Mail, label: "Messages" },

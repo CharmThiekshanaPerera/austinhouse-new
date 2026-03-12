@@ -1,18 +1,17 @@
 import { X, Plus, Minus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 
 const CartSidebar = () => {
   const { items, isOpen, setIsOpen, updateQuantity, removeItem, clearCart, totalItems, totalPrice } = useCart();
 
+  const navigate = useNavigate();
+
   const handleCheckout = () => {
-    toast({
-      title: "Order Placed! 🎉",
-      description: `${totalItems} item(s) totalling LKR ${totalPrice.toLocaleString()} — this is a demo checkout.`,
-    });
-    clearCart();
     setIsOpen(false);
+    navigate("/checkout");
   };
 
   return (

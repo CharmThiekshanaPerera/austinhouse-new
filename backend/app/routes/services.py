@@ -14,7 +14,7 @@ router = APIRouter(prefix="/services", tags=["services"])
 
 def _doc_to_service(doc: dict) -> ServiceOut:
     doc = {**doc}
-    doc["id"] = doc.pop("_id")
+    doc["id"] = str(doc.pop("_id"))
     return ServiceOut.model_validate(doc)
 
 

@@ -7,6 +7,7 @@ export interface GalleryImage {
     image: string;
     alt: string;
     category: GalleryCategory;
+    type: "image" | "video";
 }
 
 export type GalleryImageCreate = Omit<GalleryImage, "id">;

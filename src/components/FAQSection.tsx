@@ -6,7 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const faqs = [
+export const faqs = [
   {
     question: "How do I prepare for my first visit?",
     answer: "Simply arrive 15 minutes early with clean skin (no makeup). Our team will conduct a thorough consultation to understand your skin type and goals before recommending the perfect treatment plan for you.",

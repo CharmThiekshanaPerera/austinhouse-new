@@ -146,6 +146,7 @@ BookingStatus = Literal["Pending", "Confirmed", "Cancelled", "Completed"]
 class BookingBase(BaseModel):
     customer_name: str
     customer_email: str
+    customer_phone: Optional[str] = None
     service_id: str
     staff_id: Optional[str] = None
     date: str
@@ -159,6 +160,7 @@ class BookingCreate(BookingBase):
 class BookingUpdate(BaseModel):
     customer_name: Optional[str] = None
     customer_email: Optional[str] = None
+    customer_phone: Optional[str] = None
     service_id: Optional[str] = None
     staff_id: Optional[str] = None
     date: Optional[str] = None
@@ -266,6 +268,7 @@ class GalleryImageBase(BaseModel):
     image: str
     alt: str
     category: GalleryCategory
+    type: Literal["image", "video"] = "image"
 
 class GalleryImageCreate(GalleryImageBase):
     pass
@@ -274,6 +277,7 @@ class GalleryImageUpdate(BaseModel):
     image: Optional[str] = None
     alt: Optional[str] = None
     category: Optional[GalleryCategory] = None
+    type: Optional[Literal["image", "video"]] = None
 
 class GalleryImageOut(GalleryImageBase):
     id: str
@@ -296,3 +300,57 @@ class BeforeAfterUpdate(BaseModel):
 
 class BeforeAfterOut(BeforeAfterBase):
     id: str
+
+
+class SubscriberBase(BaseModel):
+    email: str
+    active: bool = True
+    created_at: str
+
+class SubscriberCreate(BaseModel):
+    email: str
+
+class SubscriberUpdate(BaseModel):
+    active: bool
+
+
+class SubscriberOut(SubscriberBase):
+    id: str
+
+
+# --- Order Models ---
+OrderStatus = Literal["Pending", "Processing", "Shipped", "Delivered", "Cancelled"]
+PaymentMethod = Literal["COD", "Card"]
+
+class OrderItem(BaseModel):
+    product_id: str
+    name: str
+    quantity: int = Field(ge=1)
+    price: int = Field(ge=0)
+    image: str
+
+class OrderBase(BaseModel):
+    items: List[OrderItem]
+    total: int
+    customer_name: str
+    customer_email: str
+    customer_phone: str
+    address: str
+    city: str
+    payment_method: PaymentMethod
+    status: OrderStatus = "Pending"
+
+class OrderCreate(OrderBase):
+    pass
+
+class OrderUpdate(BaseModel):
+    status: Optional[OrderStatus] = None
+    customer_name: Optional[str] = None
+    customer_email: Optional[str] = None
+    customer_phone: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+
+class OrderOut(OrderBase):
+    id: str
+    createdAt: str

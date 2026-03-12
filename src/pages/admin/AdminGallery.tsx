@@ -18,7 +18,7 @@ const AdminGallery = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     // Form states for Grid Image
-    const [gridForm, setGridForm] = useState({ image: "", alt: "", category: "Environment" as GalleryCategory });
+    const [gridForm, setGridForm] = useState({ image: "", alt: "", category: "Environment" as GalleryCategory, type: "image" as "image" | "video" });
 
     // Form states for Before/After Pair
     const [pairForm, setPairForm] = useState({ before_image: "", after_image: "", title: "", description: "" });
@@ -30,8 +30,8 @@ const AdminGallery = () => {
         setIsUploading(true);
         try {
             await addGalleryImage(gridForm);
-            toast({ title: "Image Uploaded ✨" });
-            setGridForm({ image: "", alt: "", category: "Environment" });
+            toast({ title: "Image/Video Added ✨" });
+            setGridForm({ image: "", alt: "", category: "Environment", type: "image" });
             setIsDialogOpen(false);
         } catch {
             toast({ title: "Error", description: "Failed to upload image.", variant: "destructive" });
@@ -106,6 +106,23 @@ const AdminGallery = () => {
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                <div>
+                                    <label className="text-sm font-medium mb-1 block">Type</label>
+                                    <Select value={gridForm.type} onValueChange={(v) => setGridForm({ ...gridForm, type: v as "image" | "video" })}>
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="image">Standard Image</SelectItem>
+                                            <SelectItem value="video">YouTube Video</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                {gridForm.type === "video" && (
+                                    <p className="text-[10px] text-muted-foreground mt-1 italic">
+                                        Paste the full YouTube URL (e.g., https://www.youtube.com/watch?v=...)
+                                    </p>
+                                )}
                                 <Button type="submit" disabled={isUploading} className="w-full bg-gold-gradient text-primary-foreground">
                                     {isUploading ? <Loader2 size={16} className="animate-spin mr-2" /> : <Upload size={16} className="mr-2" />}
                                     Save Photo
@@ -149,20 +166,55 @@ const AdminGallery = () => {
                         <CardDescription>{galleryImages.length} images assigned to categories</CardDescription>
                     </CardHeader>
                     <CardContent className="grid sm:grid-cols-2 gap-4">
-                        {galleryImages.map((img) => (
-                            <div key={img.id} className="group relative rounded-lg overflow-hidden border border-border">
-                                <img src={img.image} alt={img.alt} className="w-full h-32 object-cover" />
-                                <div className="p-3 bg-card border-t border-border">
-                                    <p className="font-semibold text-sm truncate">{img.alt}</p>
-                                    <p className="text-xs text-muted-foreground">{img.category}</p>
+                        {galleryImages.map((img) => {
+                            const isVideo = img.type === "video";
+                            let displayImage = img.image;
+                            
+                            if (isVideo) {
+                                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                                const match = img.image.match(regExp);
+                                const youtubeId = (match && match[2].length === 11) ? match[2] : null;
+                                if (youtubeId) {
+                                    displayImage = `https://img.youtube.com/vi/${youtubeId}/0.jpg`;
+                                }
+                            }
+
+                            return (
+                                <div key={img.id} className="group relative rounded-lg overflow-hidden border border-border">
+                                    <div className="relative group">
+                                        <img src={displayImage} alt={img.alt} className="w-full h-32 object-cover" />
+                                        {isVideo && (
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                                <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white">
+                                                    <Plus className="rotate-45" size={24} /> {/* Placeholder for play icon, using Plus rotated as X/Playish */}
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Button 
+                                                variant="destructive" 
+                                                size="icon" 
+                                                className="h-8 w-8" 
+                                                onClick={() => {
+                                                    if (window.confirm("Are you sure you want to delete this image?")) {
+                                                        deleteGalleryImage(img.id);
+                                                    }
+                                                }}
+                                            >
+                                                <Trash2 size={14} />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <div className="p-3 bg-card border-t border-border">
+                                        <p className="font-semibold text-sm truncate">{img.alt}</p>
+                                        <div className="flex items-center justify-between mt-1">
+                                            <p className="text-xs text-muted-foreground">{img.category}</p>
+                                            <span className="text-[10px] uppercase font-bold text-gold">{img.type}</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Button variant="destructive" size="icon" className="h-8 w-8" onClick={() => deleteGalleryImage(img.id)}>
-                                        <Trash2 size={14} />
-                                    </Button>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </CardContent>
                 </Card>
 
@@ -184,7 +236,16 @@ const AdminGallery = () => {
                                     <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{pair.description}</p>
                                 </div>
                                 <div className="absolute top-2 right-2">
-                                    <Button variant="destructive" size="icon" className="h-8 w-8" onClick={() => deleteBeforeAfterPair(pair.id)}>
+                                    <Button 
+                                        variant="destructive" 
+                                        size="icon" 
+                                        className="h-8 w-8" 
+                                        onClick={() => {
+                                            if (window.confirm("Are you sure you want to delete this transformation?")) {
+                                                deleteBeforeAfterPair(pair.id);
+                                            }
+                                        }}
+                                    >
                                         <Trash2 size={14} />
                                     </Button>
                                 </div>

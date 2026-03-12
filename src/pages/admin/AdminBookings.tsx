@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Trash2, Check, XCircle, Clock, Plus, Loader2 } from "lucide-react";
+import { Trash2, Check, XCircle, Clock, Plus, Loader2, Eye } from "lucide-react";
 import {
   format, isSameDay, parseISO, startOfMonth, endOfMonth,
   eachDayOfInterval, getDay, isToday,
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -38,6 +39,7 @@ const AdminBookings = () => {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [previewBooking, setPreviewBooking] = useState<Booking | null>(null);
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -271,6 +273,7 @@ const AdminBookings = () => {
                           {b.status === "Pending" && <Button size="sm" variant="outline" onClick={() => handleStatus(b, "Confirmed")} className="text-xs"><Check size={14} className="mr-1" />Confirm</Button>}
                           {b.status === "Confirmed" && <Button size="sm" variant="outline" onClick={() => handleStatus(b, "Completed")} className="text-xs"><Check size={14} className="mr-1" />Complete</Button>}
                           {(b.status === "Pending" || b.status === "Confirmed") && <Button size="sm" variant="outline" onClick={() => handleStatus(b, "Cancelled")} className="text-xs text-destructive"><XCircle size={14} className="mr-1" />Cancel</Button>}
+                          <Button size="sm" variant="outline" onClick={() => setPreviewBooking(b)}><Eye size={14} /></Button>
                           <Button size="sm" variant="destructive" onClick={() => handleDelete(b)}><Trash2 size={14} /></Button>
                         </div>
                       </div>
@@ -301,14 +304,17 @@ const AdminBookings = () => {
                         <Badge variant="outline" className={cn("text-xs font-body", config.className)}>{config.label}</Badge>
                       </div>
                       <p className="text-muted-foreground font-body text-xs mt-1">
-                        {b.customer_email} · {b.date ? format(parseISO(b.date), "MMM d, yyyy") : "N/A"} · {b.time}
+                        {b.customer_email} · {b.customer_phone} · {b.date ? format(parseISO(b.date), "MMM d, yyyy") : "N/A"} · {b.time}
                       </p>
                       <p className="text-muted-foreground font-body text-xs">
                         {serviceMap[b.service_id] ?? b.service_id}
                         {b.staff_id && ` · ${staffMap[b.staff_id] ?? b.staff_id}`}
                       </p>
                     </div>
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(b)}><Trash2 size={14} /></Button>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="outline" onClick={() => setPreviewBooking(b)}><Eye size={14} /></Button>
+                      <Button size="sm" variant="destructive" onClick={() => handleDelete(b)}><Trash2 size={14} /></Button>
+                    </div>
                   </CardContent>
                 </Card>
               );
@@ -316,6 +322,62 @@ const AdminBookings = () => {
           </div>
         )}
       </div>
+
+
+      {/* Booking Preview Dialog */}
+      <Dialog open={!!previewBooking} onOpenChange={(open) => !open && setPreviewBooking(null)}>
+        <DialogContent className="sm:max-w-md bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl text-foreground">
+              Booking <span className="text-gold-gradient">Details</span>
+            </DialogTitle>
+          </DialogHeader>
+          {previewBooking && (
+            <div className="space-y-4 font-body mt-2">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="block text-muted-foreground text-xs uppercase tracking-wider mb-1">Customer Name</span>
+                  <span className="font-medium text-foreground">{previewBooking.customer_name}</span>
+                </div>
+                <div>
+                  <span className="block text-muted-foreground text-xs uppercase tracking-wider mb-1">Status</span>
+                  <Badge variant="outline" className={cn("text-xs", statusConfig[previewBooking.status].className)}>
+                     {statusConfig[previewBooking.status].label}
+                  </Badge>
+                </div>
+                <div>
+                  <span className="block text-muted-foreground text-xs uppercase tracking-wider mb-1">Email</span>
+                  <span className="text-foreground">{previewBooking.customer_email}</span>
+                </div>
+                <div>
+                  <span className="block text-muted-foreground text-xs uppercase tracking-wider mb-1">Phone</span>
+                  <span className="text-foreground">{previewBooking.customer_phone || "Not provided"}</span>
+                </div>
+                <div>
+                  <span className="block text-muted-foreground text-xs uppercase tracking-wider mb-1">Date & Time</span>
+                  <span className="text-foreground">{previewBooking.date ? format(parseISO(previewBooking.date), "PPP") : "N/A"} at {previewBooking.time}</span>
+                </div>
+                <div>
+                  <span className="block text-muted-foreground text-xs uppercase tracking-wider mb-1">Service</span>
+                  <span className="font-medium text-primary">{serviceMap[previewBooking.service_id] ?? previewBooking.service_id}</span>
+                </div>
+                {previewBooking.staff_id && (
+                  <div className="col-span-2">
+                    <span className="block text-muted-foreground text-xs uppercase tracking-wider mb-1">Assigned Staff</span>
+                    <span className="text-foreground">{staffMap[previewBooking.staff_id] ?? previewBooking.staff_id}</span>
+                  </div>
+                )}
+                {previewBooking.notes && (
+                  <div className="col-span-2 bg-accent/50 p-3 rounded-md">
+                    <span className="block text-muted-foreground text-xs uppercase tracking-wider mb-1">Notes</span>
+                    <span className="text-foreground italic">{previewBooking.notes}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

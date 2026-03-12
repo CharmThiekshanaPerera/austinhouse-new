@@ -10,6 +10,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import PageTransition from "@/components/PageTransition";
 import ChatBot from "@/components/ChatBot";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import PublicLayout from "@/pages/PublicLayout";
 
 // Lazy-loaded public pages
@@ -19,7 +20,16 @@ const Services = lazy(() => import("./pages/Services"));
 const Gallery = lazy(() => import("./pages/Gallery"));
 const About = lazy(() => import("./pages/About"));
 const Contact = lazy(() => import("./pages/Contact"));
+const ChemicalPeels = lazy(() => import("./pages/services/ChemicalPeels"));
+const Facials = lazy(() => import("./pages/services/Facials"));
+const WaxingTreatments = lazy(() => import("./pages/services/WaxingTreatments"));
+const SpecializedProcedures = lazy(() => import("./pages/services/SpecializedProcedures"));
+const AntiAgingTreatments = lazy(() => import("./pages/services/AntiAgingTreatments"));
+const IntimateAreaServices = lazy(() => import("./pages/services/IntimateAreaServices"));
+const WartRemoval = lazy(() => import("./pages/services/WartRemoval"));
+const MicroDermabrasion = lazy(() => import("./pages/services/MicroDermabrasion"));
 const Blog = lazy(() => import("./pages/Blog"));
+const Checkout = lazy(() => import("./pages/Checkout"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Lazy-loaded admin pages
@@ -48,6 +58,7 @@ const AdminGiftCards = lazy(() => import("./pages/admin/AdminGiftCards"));
 const AdminWaitlist = lazy(() => import("./pages/admin/AdminWaitlist"));
 const AdminEmailTemplates = lazy(() => import("./pages/admin/AdminEmailTemplates"));
 const AdminExpenses = lazy(() => import("./pages/admin/AdminExpenses"));
+const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
     <div className="text-center space-y-4">
@@ -69,16 +80,26 @@ const AnimatedRoutes = () => {
           <Route path="/" element={<Index />} />
           <Route path="/products" element={<Products />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/services/chemical-peels" element={<ChemicalPeels />} />
+          <Route path="/services/facials" element={<Facials />} />
+          <Route path="/services/waxing" element={<WaxingTreatments />} />
+          <Route path="/services/specialized" element={<SpecializedProcedures />} />
+          <Route path="/services/anti-aging" element={<AntiAgingTreatments />} />
+          <Route path="/services/intimate" element={<IntimateAreaServices />} />
+          <Route path="/services/wart-removal" element={<WartRemoval />} />
+          <Route path="/services/micro-dermabrasion" element={<MicroDermabrasion />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/checkout" element={<Checkout />} />
         </Route>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="services" element={<AdminServices />} />
           <Route path="bookings" element={<AdminBookings />} />
+          <Route path="orders" element={<AdminOrders />} />
           <Route path="blog" element={<AdminBlog />} />
           <Route path="testimonials" element={<AdminTestimonials />} />
           <Route path="messages" element={<AdminMessages />} />
@@ -115,9 +136,16 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <ScrollToTop />
               <AnimatedRoutes />
-              <ChatBot />
+              
+              {/* Global Floating Widgets Container */}
+              <div className="fixed bottom-6 right-6 z-[60] flex flex-col md:flex-row items-center gap-3 md:gap-4 pointer-events-none">
+                <div className="pointer-events-auto flex flex-col-reverse md:flex-row items-center gap-3 md:gap-4">
+                  <ScrollToTop />
+                  <WhatsAppButton />
+                  <ChatBot />
+                </div>
+              </div>
             </BrowserRouter>
           </CartProvider>
         </DataProvider>
