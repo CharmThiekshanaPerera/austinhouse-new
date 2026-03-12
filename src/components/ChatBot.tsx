@@ -241,12 +241,12 @@ const ChatBot = () => {
                   >
                     <CalendarPlus size={14} /> Book Now
                   </button>
-                  <button
+                  {/* <button
                     onClick={startCall}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-body font-semibold tracking-wide bg-green-500/10 text-green-600 hover:bg-green-500/20 transition-colors"
                   >
                     <Phone size={14} /> Call Assistant
-                  </button>
+                  </button> */}
                 </div>
 
                 {/* Input */}

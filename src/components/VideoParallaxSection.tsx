@@ -1,4 +1,4 @@
-import { Instagram, Facebook, Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX } from "lucide-react";
 import introVideo from "@/assets/intro.mp4";
 
 import { useRef, useState } from "react";
@@ -27,7 +27,7 @@ const VideoParallaxSection = () => {
     return (
         <section
             ref={containerRef}
-            className="relative h-[90vh] min-h-[700px] w-full overflow-hidden flex items-center justify-center bg-charcoal"
+            className="relative h-[70vh] md:h-[90vh] min-h-[500px] md:min-h-[700px] w-full overflow-hidden flex items-center justify-center bg-charcoal"
         >
             {/* Background Image Layer */}
             <div className="absolute inset-0 z-0">
@@ -44,6 +44,7 @@ const VideoParallaxSection = () => {
                     autoPlay
                     loop
                     playsInline
+                    preload="auto"
                     className="w-full h-full object-cover"
                 >
                     <source
@@ -79,73 +80,44 @@ const VideoParallaxSection = () => {
                     
                     <motion.div
                         variants={{
-                            hidden: { opacity: 0, y: 20 },
-                            visible: { opacity: 1, y: 0 }
+                            hidden: { opacity: 0, y: 30 },
+                            visible: { 
+                                opacity: 1, 
+                                y: 0,
+                                transition: {
+                                    duration: 1,
+                                    ease: "easeOut",
+                                    delay: 0.5
+                                }
+                            }
                         }}
-                        className="absolute bottom-20 left-0 right-0 px-4 md:px-8 z-50 pointer-events-none"
+                        className="absolute bottom-10 md:bottom-24 left-0 right-0 px-4 md:px-8 z-50 pointer-events-none"
                     >
-                        <p className="font-body text-white text-base md:text-xl max-w-4xl mx-auto font-light leading-relaxed text-center drop-shadow-2xl bg-black/40 backdrop-blur-md py-6 px-8 rounded-2xl border border-white/10">
+                        <p className="font-body text-white text-[13px] md:text-xl lg:text-2xl max-w-5xl mx-auto font-light leading-relaxed text-center drop-shadow-2xl bg-black/50 backdrop-blur-xl py-5 md:py-10 px-6 md:px-14 rounded-2xl md:rounded-[3rem] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                            <motion.span
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 1, delay: 0.8 }}
+                                className="block mb-3 text-gold/90 font-medium tracking-[0.3em] uppercase text-[10px] md:text-xs"
+                            >
+                                Experience Excellence
+                            </motion.span>
                             "Immerse yourself in Colombo's most exclusive sanctuary.
                             Experience treatments designed not just to enhance your appearance,
                             but to restore your inner balance."
                         </p>
                     </motion.div>
 
-                    {/* Sound Control Toggle */}
-                    <div className="absolute bottom-40 right-8 z-[60]">
+                    {/* Sound Control Toggle - Repositioned for Mobile */}
+                    <div className="absolute bottom-6 md:bottom-20 right-4 md:right-12 z-[60]">
                         <button 
                             onClick={toggleMute}
-                            className="p-3 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all group"
+                            className="p-2.5 md:p-4 rounded-full bg-black/50 backdrop-blur-lg border border-white/20 text-white hover:bg-gold/20 hover:border-gold/50 transition-all group shadow-2xl"
                             title={isMuted ? "Unmute" : "Mute"}
                         >
-                            {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                            {isMuted ? <VolumeX size={18} className="md:w-6 md:h-6" /> : <Volume2 size={18} className="md:w-6 md:h-6" />}
                         </button>
                     </div>
-
-                    <motion.div 
-                        variants={{
-                            hidden: { opacity: 0, y: 30 },
-                            visible: { opacity: 1, y: 0 }
-                        }}
-                        className="flex items-center justify-center gap-6"
-                    >
-                        <div className="h-[1px] w-12 md:w-20 bg-gradient-to-r from-transparent to-gold/50" />
-                        <div className="flex gap-6">
-                            <a 
-                                href="https://www.instagram.com/austinhouse_aestheticcentre/" 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold/10 hover:border-gold hover:scale-110 transition-all bg-white/5 backdrop-blur-sm"
-                            >
-                                <Instagram size={20} />
-                            </a>
-                            <a 
-                                href="https://www.facebook.com/austincolombo7" 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center text-gold hover:bg-gold/10 hover:border-gold hover:scale-110 transition-all bg-white/5 backdrop-blur-sm"
-                            >
-                                <Facebook size={20} />
-                            </a>
-                        </div>
-                        <div className="h-[1px] w-12 md:w-20 bg-gradient-to-l from-transparent to-gold/50" />
-                    </motion.div>
-
-                    <motion.div
-                        variants={{
-                            hidden: { opacity: 0 },
-                            visible: { opacity: 1 }
-                        }}
-                        className="mt-16"
-                    >
-                        <motion.div
-                            animate={{ y: [0, 10, 0] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className="w-6 h-10 border-2 border-gold/30 rounded-full mx-auto flex justify-center p-1"
-                        >
-                            <div className="w-1 h-2 bg-gold border border-gold rounded-full" />
-                        </motion.div>
-                    </motion.div>
                 </motion.div>
             </div>
         </section>
