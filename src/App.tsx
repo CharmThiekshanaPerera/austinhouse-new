@@ -11,7 +11,6 @@ import ScrollToTop from "@/components/ScrollToTop";
 import PageTransition from "@/components/PageTransition";
 import ChatBot from "@/components/ChatBot";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import WelcomeVoice from "@/components/WelcomeVoice";
 import PublicLayout from "@/pages/PublicLayout";
 
 // Lazy-loaded public pages
@@ -137,7 +136,6 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <WelcomeVoice />
               <AnimatedRoutes />
               
               {/* Global Floating Widgets Container */}

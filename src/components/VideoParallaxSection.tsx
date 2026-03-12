@@ -1,16 +1,21 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { Instagram, Facebook, Star, Award, ShieldCheck } from "lucide-react";
-import backgroundImage from "@/assets/gold-standard-bg.png";
+import { Instagram, Facebook, Volume2, VolumeX } from "lucide-react";
+import introVideo from "@/assets/intro.mp4";
 
-const features = [
-    { icon: Star, text: "5-Star Excellence" },
-    { icon: Award, text: "Award-Winning Staff" },
-    { icon: ShieldCheck, text: "Premium Safety Standards" },
-];
+import { useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const VideoParallaxSection = () => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [isMuted, setIsMuted] = useState(false); // Default to unmuted as requested
+
+    const toggleMute = () => {
+        if (videoRef.current) {
+            videoRef.current.muted = !videoRef.current.muted;
+            setIsMuted(videoRef.current.muted);
+        }
+    };
+
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start end", "end start"],
@@ -26,35 +31,30 @@ const VideoParallaxSection = () => {
         >
             {/* Background Image Layer */}
             <div className="absolute inset-0 z-0">
-                <img 
-                    src={backgroundImage} 
-                    alt="Luxury Spa Background" 
-                    className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-charcoal/40 z-10" />
+                {/* Removed obscured static background image to prioritize video clarity */}
             </div>
 
             {/* Parallax Video Overlay Layer */}
             <motion.div
                 style={{ y }}
-                className="absolute inset-0 w-full h-[120%] z-10 opacity-30 mix-blend-screen"
+                className="absolute inset-0 w-full h-[120%] z-10 opacity-100"
             >
                 <video
+                    ref={videoRef}
                     autoPlay
                     loop
-                    muted
                     playsInline
                     className="w-full h-full object-cover"
                 >
                     <source
-                        src="https://player.vimeo.com/external/498305001.sd.mp4?s=d0db586c91350a8ceca9fd8ebd598ff7b7bbcb17&profile_id=164&oauth2_token_id=57447761"
+                        src={introVideo}
                         type="video/mp4"
                     />
                 </video>
             </motion.div>
 
-            {/* Final darkening gradient */}
-            <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-transparent to-background/60 z-20" />
+            {/* Subtle Gradient for text readability at bottom only */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-20 pointer-events-none" />
 
 
             {/* Content Overlay */}
@@ -75,58 +75,32 @@ const VideoParallaxSection = () => {
                     }}
                     className="max-w-4xl mx-auto text-center"
                 >
-                    <motion.p 
-                        variants={{
-                            hidden: { opacity: 0, y: 20 },
-                            visible: { opacity: 1, y: 0 }
-                        }}
-                        className="text-gold uppercase tracking-[0.4em] text-sm md:text-base font-body font-semibold mb-6"
-                    >
-                        The Gold Standard
-                    </motion.p>
+                    {/* Middle and center content removed to show video clearly */}
                     
-                    <motion.h2 
-                        variants={{
-                            hidden: { opacity: 0, scale: 0.9 },
-                            visible: { opacity: 1, scale: 1 }
-                        }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="font-display text-4xl md:text-7xl lg:text-8xl font-bold text-white leading-tight mb-8"
-                    >
-                        Where Beauty Meets <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold via-[#FDF3A7] to-gold drop-shadow-sm">
-                            Tranquility
-                        </span>
-                    </motion.h2>
-
-                    <motion.div 
+                    <motion.div
                         variants={{
                             hidden: { opacity: 0, y: 20 },
                             visible: { opacity: 1, y: 0 }
                         }}
-                        className="flex flex-wrap justify-center gap-6 md:gap-12 mb-12"
+                        className="absolute bottom-20 left-0 right-0 px-4 md:px-8 z-50 pointer-events-none"
                     >
-                        {features.map((feature, i) => (
-                            <div key={i} className="flex items-center gap-2 text-white/90 group cursor-default">
-                                <feature.icon size={18} className="text-gold group-hover:scale-125 transition-transform" />
-                                <span className="font-body text-xs md:text-sm uppercase tracking-widest font-medium border-b border-transparent group-hover:border-gold/50 transition-all pb-1">
-                                    {feature.text}
-                                </span>
-                            </div>
-                        ))}
+                        <p className="font-body text-white text-base md:text-xl max-w-4xl mx-auto font-light leading-relaxed text-center drop-shadow-2xl bg-black/40 backdrop-blur-md py-6 px-8 rounded-2xl border border-white/10">
+                            "Immerse yourself in Colombo's most exclusive sanctuary.
+                            Experience treatments designed not just to enhance your appearance,
+                            but to restore your inner balance."
+                        </p>
                     </motion.div>
-                    
-                    <motion.p 
-                        variants={{
-                            hidden: { opacity: 0 },
-                            visible: { opacity: 1 }
-                        }}
-                        className="font-body text-white/80 text-lg md:text-2xl max-w-2xl mx-auto font-light leading-relaxed mb-12 italic"
-                    >
-                        "Immerse yourself in Colombo's most exclusive sanctuary.
-                        Experience treatments designed not just to enhance your appearance,
-                        but to restore your inner balance."
-                    </motion.p>
+
+                    {/* Sound Control Toggle */}
+                    <div className="absolute bottom-40 right-8 z-[60]">
+                        <button 
+                            onClick={toggleMute}
+                            className="p-3 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all group"
+                            title={isMuted ? "Unmute" : "Mute"}
+                        >
+                            {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                        </button>
+                    </div>
 
                     <motion.div 
                         variants={{
